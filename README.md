@@ -286,19 +286,6 @@ node run.js start
 
 ---
 
-## 👥 Who's Using NOVAQUOTE ?
-
-> "J'ai lancé NOVAQUOTE il y a 3 mois. Résultat : +2 847€ de profit net sans lever le petit doigt. Mes amis sont maintenant jaloux !"
-> **— Jboner, Développeur** ⭐⭐⭐⭐⭐
-
-> "C'est le futur du trading. 4 agents IA qui trabajan para ti. L'interface est magnifique et ça marche vraiment !"
-> **— CryptoTrader47** ⭐⭐⭐⭐⭐
-
-> "Le dashboard temps réel est addictif. Je vérifie mes gains 10 fois par jour, comme un jeu !"
-> **— BitCoinMax** ⭐⭐⭐⭐⭐
-
-**Rejoins la révolution du trading automatisé !** 🚀
-
 ---
 
 ## 🛡️ Sécurité & Fiabilité
