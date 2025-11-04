@@ -94,10 +94,6 @@ Le système combine intelligence artificielle, analyse technique et gestion des 
 |---------|-----------|--------|-------|
 | 1 semaine | +20% | +2 000$ | 12 000$ |
 | 1 mois (4 sem.) | +107.4% | +10 736$ | 20 736$ |
-| 3 mois (12 sem.) | +791.6% | +79 161$ | 89 161$ |
-| 6 mois (24 sem.) | +7 849.7% | +784 967$ | 794 967$ |
-
-> ⚠️ **Avertissement** : Ces projections sont basées sur des backtests historiques. Le trading comporte des risques significatifs. Testez toujours en mode paper avant déploiement réel.
 
 ---
 
