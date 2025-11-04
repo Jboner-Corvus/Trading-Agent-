@@ -5,7 +5,7 @@
 ![NOVAQUOTE Banner](https://img.shields.io/badge/NOVAQUOTE-Trading%20System-blue?style=for-the-badge&logo=tradingview)
 ![Python](https://img.shields.io/badge/Python-3.12-FFD43B?style=for-the-badge&logo=python&logoColor=yellow)
 ![Node.js](https://img.shields.io/badge/Node.js-24.6-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![AI Agents](https://img.shields.io/badge/AI-Agents-4-orange?style=for-the-badge&logo=openai&logoColor=white)
+![Z.AI Models](https://img.shields.io/badge/Z.AI-Models-orange?style=for-the-badge)
 ![Status](https://img.shields.io/badge/Status-Live%20Trading-green?style=for-the-badge&logo=bitcoin&logoColor=green)
 
 **[Version 1.0] | [Live Demo](http://localhost:9001) | [Documentation](./docs/CIRCULAR_SYSTEM_GUIDE.md)**
