@@ -8,6 +8,8 @@ import express, { Express, Request, Response, NextFunction } from 'express';
 import { WebSocketServer } from 'ws';
 import cors from 'cors';
 import { spawn } from 'child_process';
+import path from 'path';
+import fs from 'fs';
 
 // Types
 interface Colors {
