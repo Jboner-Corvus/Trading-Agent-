@@ -290,15 +290,32 @@ node run.js start
 
 ## 🛡️ Sécurité & Fiabilité
 
+### ⚠️ ATTENTION : RISQUES RÉELS
 - ✅ **Clés API** chiffrées et sécurisées
 - ✅ **Risk Agent** = Protection de ton capital
+- ✅ **Master Agent** = Coordination intelligente de tous les agents
 - ✅ **Stop Loss** automatique
 - ✅ **Logs détaillés** = Traçabilité complète
 - ✅ **Tests automatisés** = Code vérifié
 - ✅ **Open Source** = Communauté transparente
-- ✅ **Pas de server centralisé** = Tes clés restent chez toi
 
-**TON SÉCURITÉ = NOTRE PRIORITÉ #1**
+### 🔐 WALLET & SIGNATURES
+**IMPORTANT** : Les agents ont accès à votre wallet Metamask et peuvent signer des transactions automatiquement !
+
+- ⚠️ **Configurez des limites** avant de lancer le système
+- ⚠️ **Utilisez un wallet dédié** pour le trading
+- ⚠️ **Ne laissez jamais le Master Agent tourner sans surveillance** au début
+- ⚠️ **Vérifiez les signatures** dans Metamask régulièrement
+- ⚠️ **Testez en mode Paper Trading** avant de passer en réel
+
+### 🤖 RÔLE DU MASTER AGENT
+Le **Master Agent** est le cerveau central qui :
+- Coordonne les 4 agents IA
+- Prend les décisions finales d'achat/vente
+- Exécute les signatures automatiques
+- Peut être arrêté à tout moment via `/api/agents/master/stop`
+
+**Sécurité = VOTRE RESPONSABILITÉ**
 
 ---
 
