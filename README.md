@@ -80,11 +80,11 @@ Imagine : tu parts en vacances, et pendant que tu sirotes ton cocktail sur la pl
 
 ### 🎯 Ce que ça veut dire concrètement
 
-Avec **10 000€** investis et un ROI moyen de **+20%** :
-- **1 mois** : +2 000€ (tu gagnes un SMIC)
-- **3 mois** : +6 000€ (tu gagnes un salaire complet)
-- **6 mois** : +12 000€ (tu gagnes deux salaires)
-- **1 an** : +24 000€ (tu doubles ton capital !)
+Avec **10 000$** investis et un ROI moyen de **+20%** :
+- **1 mois** : +2 000$ (tu gagnes un SMIC)
+- **3 mois** : +6 000$ (tu gagnes un salaire complet)
+- **6 mois** : +12 000$ (tu gagnes deux salaires)
+- **1 an** : +24 000$ (tu doubles ton capital !)
 
 > 💡 **Note** : Ces chiffres sont basés sur des backtests historiques. Le trading comporte des risques, teste toujours en petit d'abord.
 
@@ -163,7 +163,7 @@ node run.js start
 │   • Cycles exécutés: 72                                   │
 │   • Taux de réussite: 87%                                 │
 │   • Retour moyen: +18.5%                                  │
-│   • Profit net: +1,247€                                   │
+│   • Profit net: +1,247$                                   │
 │                                                             │
 └─────────────────────────────────────────────────────────────┘
 ```
