@@ -3965,3 +3965,99 @@ select option {
     font-style: italic;
 }
 
+/* 🤖 Master Agent Status Panel */
+.agent-status-panel {
+    background: var(--bg-card);
+    border: 1px solid rgba(0, 212, 255, 0.3);
+    border-radius: 12px;
+    padding: 20px;
+    margin: 20px 0;
+    box-shadow: var(--shadow-lg);
+}
+
+.agent-status-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.agent-status-header h2 {
+    color: var(--accent-blue);
+    font-size: 1.4em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.agent-status-controls {
+    display: flex;
+    gap: 10px;
+}
+
+.agent-control-btn {
+    background: var(--bg-glass);
+    border: 1px solid var(--accent-blue);
+    color: var(--text-primary);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.9em;
+    transition: all 0.3s ease;
+}
+
+.agent-control-btn:hover {
+    background: var(--accent-blue);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4);
+}
+
+.agent-control-btn.secondary {
+    border-color: var(--text-secondary);
+}
+
+.agent-control-btn.secondary:hover {
+    background: var(--text-secondary);
+    box-shadow: 0 4px 12px rgba(184, 184, 200, 0.4);
+}
+
+.agent-control-btn i {
+    font-size: 0.85em;
+}
+
+.ascii-dashboard {
+    background: #0a0a0a;
+    border: 2px solid #1a1a2e;
+    border-radius: 8px;
+    padding: 20px;
+    overflow-x: auto;
+    font-family: 'Courier New', 'Monaco', 'Menlo', monospace;
+}
+
+.ascii-dashboard pre {
+    margin: 0;
+    color: #00ff00;
+    font-size: 13px;
+    line-height: 1.4;
+    white-space: pre;
+    background: transparent;
+}
+
+#master-agent-dashboard {
+    animation: pulse-glow 2s infinite;
+}
+
+@keyframes pulse-glow {
+    0%, 100% {
+        text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+    }
+    50% {
+        text-shadow: 0 0 10px rgba(0, 255, 0, 0.8), 0 0 20px rgba(0, 255, 0, 0.3);
+    }
+}
+

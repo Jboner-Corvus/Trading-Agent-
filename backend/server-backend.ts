@@ -567,20 +567,81 @@ app.get('/api/dashboard/real-time', async (req: Request, res: Response) => {
         timestamp: new Date().toISOString()
       });
     } else {
-      log.warn('Dashboard data file not found', 'DASHBOARD');
+      // Mock data for testing dashboard
+      const now = new Date();
+      const currentCycle = `2025-11-04_${now.getHours().toString().padStart(2, '0')}:${Math.floor(now.getMinutes() / 20) * 20}`;
+
+      const mockData = {
+        timestamp: new Date().toISOString(),
+        current_cycle: currentCycle,
+        next_cycle: new Date(now.getTime() + 20 * 60 * 1000).toISOString().substring(11, 16),
+        system_status: 'EXCELLENT',
+        active_agents: {
+          'risk_agent': {
+            status: 'SUCCESS',
+            confidence: 0.85,
+            llm_calls: 2,
+            last_update: new Date().toISOString(),
+            execution_time_ms: 150
+          },
+          'strategy_agent': {
+            status: 'SUCCESS',
+            confidence: 0.92,
+            signals: 3,
+            last_update: new Date().toISOString(),
+            execution_time_ms: 230
+          },
+          'funding_agent': {
+            status: 'SUCCESS',
+            confidence: 0.78,
+            arbitrage: 1,
+            last_update: new Date().toISOString(),
+            execution_time_ms: 180
+          },
+          'sentiment_agent': {
+            status: 'SUCCESS',
+            confidence: 0.67,
+            mood: 'Bullish 65%',
+            last_update: new Date().toISOString(),
+            execution_time_ms: 120
+          }
+        },
+        current_decision: {
+          decision: 'EXECUTER_BUY_SIGNALS',
+          confidence: 0.89,
+          expected_roi: 0.0023,
+          summary: {
+            buy_signals: 3,
+            sell_signals: 0,
+            avg_confidence: 0.82,
+            agents_status: {
+              'risk_agent': 'SUCCESS',
+              'strategy_agent': 'SUCCESS',
+              'funding_agent': 'SUCCESS',
+              'sentiment_agent': 'SUCCESS'
+            }
+          },
+          timestamp: new Date().toISOString()
+        },
+        performance_stats: {
+          total_cycles: 72,
+          success_rate: 0.875,
+          average_confidence: 0.84,
+          net_profit: 1247,
+          recent_cycles: []
+        },
+        recent_cycles: [],
+        alerts: []
+      };
+
+      log.api.request('GET', '/api/dashboard/real-time');
+      log.info('📊 Mock dashboard data sent (Master Agent not running)', 'DASHBOARD');
 
       res.json({
         success: true,
-        data: {
-          timestamp: new Date().toISOString(),
-          system_status: 'INIT',
-          active_agents: {},
-          current_decision: null,
-          performance_stats: {},
-          recent_cycles: [],
-          alerts: []
-        },
-        message: 'Dashboard data not yet available - agents may not be running'
+        data: mockData,
+        timestamp: new Date().toISOString(),
+        note: 'Mock data - Master Agent not running'
       });
     }
   } catch (error: any) {

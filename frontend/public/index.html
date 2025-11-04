@@ -99,6 +99,54 @@
             </div>
         </div>
 
+        <!-- Agent Master System Status -->
+        <div class="agent-status-panel">
+            <div class="agent-status-header">
+                <h2><i class="fas fa-robot"></i> Master Agent System Status</h2>
+                <div class="agent-status-controls">
+                    <button class="agent-control-btn" id="start-master-agent">
+                        <i class="fas fa-play"></i> Start
+                    </button>
+                    <button class="agent-control-btn" id="stop-master-agent">
+                        <i class="fas fa-stop"></i> Stop
+                    </button>
+                    <button class="agent-control-btn secondary" id="refresh-agent-status">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <div class="ascii-dashboard">
+<pre id="master-agent-dashboard">
+┌─────────────────────────────────────────────────────────────┐
+│                    SYSTEM STATUS                             │
+│                  ● OFFLINE                                   │
+│                                                             │
+│ Current Cycle: --                                           │
+│ Next Execution: --                                          │
+│                                                             │
+│ AGENT STATUS:                                               │
+│   Risk Agent     [○] --% confidence  | -- LLM calls         │
+│   Strategy Agent [○] --% confidence  | -- signals          │
+│   Funding Agent  [○] --% confidence  | -- arbitrage        │
+│   Sentiment Agent[○] --% confidence  | -- mood            │
+│                                                             │
+│ CURRENT DECISION:                                           │
+│   Action: WAITING_FOR_START                                 │
+│   Confidence: --%                                           │
+│   Expected ROI: --%                                         │
+│                                                             │
+│ PERFORMANCE:                                                │
+│   Cycles: 0 executed                                       │
+│   Success Rate: --%                                        │
+│   Avg Return: --%                                          │
+│   Net Profit: --$                                          │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘
+</pre>
+            </div>
+        </div>
+
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card profit">
@@ -1654,6 +1702,213 @@
 
             console.log('🔗 MetaMask integration initialized');
         });
+
+        // 🤖 Master Agent Dashboard Integration
+        document.addEventListener('DOMContentLoaded', function() {
+            // Setup Master Agent control buttons
+            const startBtn = document.getElementById('start-master-agent');
+            const stopBtn = document.getElementById('stop-master-agent');
+            const refreshBtn = document.getElementById('refresh-agent-status');
+
+            if (startBtn) {
+                startBtn.addEventListener('click', startMasterAgent);
+            }
+
+            if (stopBtn) {
+                stopBtn.addEventListener('click', stopMasterAgent);
+            }
+
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', refreshAgentStatus);
+            }
+
+            // Initial status check
+            setTimeout(refreshAgentStatus, 2000);
+
+            // Auto-refresh every 5 seconds
+            setInterval(refreshAgentStatus, 5000);
+
+            console.log('🤖 Master Agent Dashboard initialized');
+        });
+
+        async function startMasterAgent() {
+            try {
+                const response = await fetch('http://localhost:7000/api/agents/master/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('🚀 Master Agent started successfully', 'success');
+                    setTimeout(refreshAgentStatus, 1000);
+                } else {
+                    showNotification(`❌ Failed to start: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error starting Master Agent:', error);
+                showNotification('❌ Failed to connect to backend', 'error');
+            }
+        }
+
+        async function stopMasterAgent() {
+            try {
+                const response = await fetch('http://localhost:7000/api/agents/master/stop', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    showNotification('🛑 Master Agent stopped', 'success');
+                    setTimeout(refreshAgentStatus, 1000);
+                } else {
+                    showNotification(`❌ Failed to stop: ${data.error}`, 'error');
+                }
+            } catch (error) {
+                console.error('Error stopping Master Agent:', error);
+                showNotification('❌ Failed to connect to backend', 'error');
+            }
+        }
+
+        async function refreshAgentStatus() {
+            try {
+                // First check if Master Agent is running
+                const statusResponse = await fetch('http://localhost:7000/api/agents/master/status');
+                const statusData = await statusResponse.json();
+
+                if (statusData.success) {
+                    const status = statusData.status;
+                    const hasData = statusData.has_dashboard_data;
+
+                    if (hasData) {
+                        // Get real dashboard data
+                        const dashboardResponse = await fetch('http://localhost:7000/api/dashboard/real-time');
+                        const dashboardData = await dashboardResponse.json();
+
+                        if (dashboardData.success) {
+                            updateMasterAgentDashboard(dashboardData.data);
+                        } else {
+                            updateMasterAgentDashboard(null);
+                        }
+                    } else {
+                        updateMasterAgentDashboard(null);
+                    }
+                } else {
+                    updateMasterAgentDashboard(null);
+                }
+            } catch (error) {
+                console.error('Error refreshing agent status:', error);
+                // Show offline status
+                updateMasterAgentDashboard(null);
+            }
+        }
+
+        function updateMasterAgentDashboard(data) {
+            const dashboardEl = document.getElementById('master-agent-dashboard');
+
+            if (!dashboardEl || !data) {
+                // Offline or no data state
+                dashboardEl.innerHTML = `┌─────────────────────────────────────────────────────────────┐
+│                    SYSTEM STATUS                             │
+│                  ● OFFLINE                                   │
+│                                                             │
+│ Current Cycle: --                                           │
+│ Next Execution: --                                          │
+│                                                             │
+│ AGENT STATUS:                                               │
+│   Risk Agent     [○] --% confidence  | -- LLM calls         │
+│   Strategy Agent [○] --% confidence  | -- signals          │
+│   Funding Agent  [○] --% confidence  | -- arbitrage        │
+│   Sentiment Agent[○] --% confidence  | -- mood            │
+│                                                             │
+│ CURRENT DECISION:                                           │
+│   Action: WAITING_FOR_START                                 │
+│   Confidence: --%                                           │
+│   Expected ROI: --%                                         │
+│                                                             │
+│ PERFORMANCE:                                                │
+│   Cycles: 0 executed                                       │
+│   Success Rate: --%                                        │
+│   Avg Return: --%                                          │
+│   Net Profit: --$                                          │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘`;
+                return;
+            }
+
+            // Format the dashboard with real data
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('fr-FR', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            const currentCycle = data.current_cycle || '--';
+            const nextCycle = data.next_cycle || '--';
+            const systemStatus = data.system_status || 'UNKNOWN';
+
+            // Get agent status
+            const agents = data.active_agents || {};
+            const riskAgent = agents['risk_agent'] || {};
+            const strategyAgent = agents['strategy_agent'] || {};
+            const fundingAgent = agents['funding_agent'] || {};
+            const sentimentAgent = agents['sentiment_agent'] || {};
+
+            // Format agent statuses
+            const agentLines = [
+                `│   Risk Agent     [${riskAgent.status === 'SUCCESS' ? '●' : '○'}] ${riskAgent.confidence || '--'}% confidence  | ${riskAgent.llm_calls || '--'} LLM calls         │`,
+                `│   Strategy Agent [${strategyAgent.status === 'SUCCESS' ? '●' : '○'}] ${strategyAgent.confidence || '--'}% confidence  | ${strategyAgent.signals || '--'} signals          │`,
+                `│   Funding Agent  [${fundingAgent.status === 'SUCCESS' ? '●' : '○'}] ${fundingAgent.confidence || '--'}% confidence  | ${fundingAgent.arbitrage || '--'} arbitrage        │`,
+                `│   Sentiment Agent[${sentimentAgent.status === 'SUCCESS' ? '●' : '○'}] ${sentimentAgent.confidence || '--'}% confidence  | ${sentimentAgent.mood || '--'} mood            │`
+            ].join('\n');
+
+            // Get current decision
+            const decision = data.current_decision || {};
+            const action = decision.decision || 'NO_DECISION';
+            const confidence = decision.confidence ? `${(decision.confidence * 100).toFixed(1)}` : '--';
+            const expectedRoi = decision.expected_roi ? `${(decision.expected_roi * 100).toFixed(2)}` : '--';
+
+            // Get performance stats
+            const metrics = data.metrics || {};
+            const cycles = metrics.total_cycles || 0;
+            const successRate = metrics.success_rate ? `${(metrics.success_rate * 100).toFixed(1)}` : '--';
+            const avgReturn = metrics.average_confidence ? `${(metrics.average_confidence * 100).toFixed(1)}` : '--';
+            const netProfit = metrics.net_profit || '--';
+
+            // Build the ASCII dashboard
+            const asciiDashboard = `┌─────────────────────────────────────────────────────────────┐
+│                    SYSTEM STATUS                             │
+│                  ● ${systemStatus.padEnd(38)} │
+│                                                             │
+│ Current Cycle: ${currentCycle.padEnd(40)} │
+│ Next Execution: ${nextCycle.padEnd(40)} │
+│                                                             │
+│ AGENT STATUS:                                               │
+${agentLines}
+│                                                             │
+│ CURRENT DECISION:                                           │
+│   Action: ${action.padEnd(45)} │
+│   Confidence: ${confidence.padEnd(45)} │
+│   Expected ROI: ${expectedRoi.padEnd(45)} │
+│                                                             │
+│ PERFORMANCE:                                                │
+│   Cycles: ${cycles.toString().padEnd(42)} │
+│   Success Rate: ${successRate.padEnd(39)} │
+│   Avg Return: ${avgReturn.padEnd(42)} │
+│   Net Profit: ${netProfit.padEnd(41)} │
+│                                                             │
+└─────────────────────────────────────────────────────────────┘`;
+
+            dashboardEl.innerHTML = asciiDashboard;
+        }
     </script>
 </body>
 </html>
