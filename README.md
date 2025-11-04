@@ -288,25 +288,53 @@ node run.js start
 
 ---
 
-## 🛡️ Sécurité & Fiabilité
+## 🤖 Master Agent - Le Cerveau du Système
 
-### ⚠️ ATTENTION : RISQUES RÉELS
-- ✅ **Clés API** chiffrées et sécurisées
-- ✅ **Risk Agent** = Protection de ton capital
-- ✅ **Master Agent** = Coordination intelligente de tous les agents
-- ✅ **Stop Loss** automatique
-- ✅ **Logs détaillés** = Traçabilité complète
-- ✅ **Tests automatisés** = Code vérifié
-- ✅ **Open Source** = Communauté transparente
+Le **Master Agent** est l'orchestrateur central qui donne vie à NOVAQUOTE :
 
-### 🤖 RÔLE DU MASTER AGENT
-Le **Master Agent** est le cerveau central qui :
-- Coordonne les 4 agents IA
-- Prend les décisions finales d'achat/vente
-- Exécute les signatures automatiques
-- Peut être arrêté à tout moment via `/api/agents/master/stop`
+### 🧠 Intelligence Centrale
+- **Coordination** des 4 agents IA (Risk, Strategy, Funding, Sentiment)
+- **Synthèse** des analyses en temps réel
+- **Prise de décision** unifiée basée sur 8+ stratégies backtestées
 
-**Sécurité = VOTRE RESPONSABILITÉ**
+### ⚡ Exécution Automatique
+- **Décisions finales** d'achat/vente avec confiance calculée
+- **Exécution** des trades via HyperLiquid API
+- **Signatures automatiques** - Les agents signent à votre place !
+- **Monitoring continu** - Surveillance 24/7 sans interruption
+
+### 🎮 Contrôle Temps Réel
+- **Dashboard live** : http://localhost:9001
+- **Cycle automatique** : toutes les 20 minutes
+- **API Control** :
+  - `POST /api/agents/master/start` - Démarrer
+  - `POST /api/agents/master/stop` - Arrêter
+  - `GET /api/agents/master/status` - Status
+- **Logs détaillés** - Traçabilité complète de chaque décision
+
+### ⚠️IMPORTANT
+**Le Master Agent a accès à votre wallet Metamask et peut signer des transactions automatiquement !**
+
+### 🎯 Quick Start (Récapitulatif)
+
+```bash
+# 1. Cloner
+git clone https://github.com/Jboner-Corvus/Trading-Agent-.git
+
+# 2. Installer
+npm install && pip install -r requirements.txt
+
+# 3. Configurer
+cp .env.example .env  # Éditer .env avec tes clés API
+
+# 4. Lancer
+node run.js start
+
+# 5. Ouvrir
+http://localhost:9001
+```
+
+**C'est parti ! 🚀**
 
 ---
 
