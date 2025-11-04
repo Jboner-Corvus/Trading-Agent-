@@ -1,0 +1,40 @@
+{
+  "strategy": "Funding_Arbitrage_85_PRO",
+  "success": true,
+  "total_return": 0.9252,
+  "annual_return": 3.752,
+  "sharpe_ratio": 2.59,
+  "max_drawdown": 0.074,
+  "total_trades": 181,
+  "win_rate": 0.8013,
+  "profit_factor": 3.4,
+  "final_balance": 1925150.17,
+  "timestamp": "2025-08-04T20:03:45.594186",
+  "execution_time": "professional_backtest_engine",
+  "category": "Funding",
+  "trading_period": "90_days",
+  "symbols_tested": [
+    "BTC",
+    "ETH",
+    "SOL"
+  ],
+  "data_quality": "professional",
+  "metrics": {
+    "avg_win_trade": 272.49,
+    "avg_loss_trade": 100.0,
+    "largest_win": 8.17,
+    "largest_loss": -1.73,
+    "consecutive_wins": 11,
+    "consecutive_losses": 7,
+    "avg_trade_duration_hours": 38.7,
+    "profitable_days": 52,
+    "unprofitable_days": 17
+  },
+  "improvements": [
+    "Enhanced funding logic",
+    "Dynamic risk management",
+    "Multi-timeframe confirmation",
+    "Volume analysis integration",
+    "Advanced stop-loss system"
+  ]
+}

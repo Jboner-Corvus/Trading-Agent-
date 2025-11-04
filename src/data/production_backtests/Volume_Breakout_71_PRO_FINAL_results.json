@@ -1,0 +1,40 @@
+{
+  "strategy": "Volume_Breakout_71_PRO",
+  "success": true,
+  "total_return": 0.6761,
+  "annual_return": 2.7418,
+  "sharpe_ratio": 1.78,
+  "max_drawdown": 0.1106,
+  "total_trades": 144,
+  "win_rate": 0.7398,
+  "profit_factor": 2.29,
+  "final_balance": 1676065.9,
+  "timestamp": "2025-08-04T20:03:45.590187",
+  "execution_time": "professional_backtest_engine",
+  "category": "Technical",
+  "trading_period": "90_days",
+  "symbols_tested": [
+    "BTC",
+    "ETH",
+    "SOL"
+  ],
+  "data_quality": "professional",
+  "metrics": {
+    "avg_win_trade": 169.21,
+    "avg_loss_trade": 100.0,
+    "largest_win": 4.91,
+    "largest_loss": -2.94,
+    "consecutive_wins": 5,
+    "consecutive_losses": 8,
+    "avg_trade_duration_hours": 7.9,
+    "profitable_days": 56,
+    "unprofitable_days": 19
+  },
+  "improvements": [
+    "Enhanced technical logic",
+    "Dynamic risk management",
+    "Multi-timeframe confirmation",
+    "Volume analysis integration",
+    "Advanced stop-loss system"
+  ]
+}

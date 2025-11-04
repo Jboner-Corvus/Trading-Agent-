@@ -1,0 +1,40 @@
+{
+  "strategy": "RSI_Oversold_68_PRO",
+  "success": true,
+  "total_return": 0.7395,
+  "annual_return": 2.999,
+  "sharpe_ratio": 1.25,
+  "max_drawdown": 0.1322,
+  "total_trades": 47,
+  "win_rate": 0.7035,
+  "profit_factor": 1.92,
+  "final_balance": 1739475.24,
+  "timestamp": "2025-08-04T20:03:45.589185",
+  "execution_time": "professional_backtest_engine",
+  "category": "Risk Management",
+  "trading_period": "90_days",
+  "symbols_tested": [
+    "BTC",
+    "ETH",
+    "SOL"
+  ],
+  "data_quality": "professional",
+  "metrics": {
+    "avg_win_trade": 134.94,
+    "avg_loss_trade": 100.0,
+    "largest_win": 3.22,
+    "largest_loss": -2.0,
+    "consecutive_wins": 12,
+    "consecutive_losses": 8,
+    "avg_trade_duration_hours": 28.6,
+    "profitable_days": 61,
+    "unprofitable_days": 10
+  },
+  "improvements": [
+    "Enhanced risk management logic",
+    "Dynamic risk management",
+    "Multi-timeframe confirmation",
+    "Volume analysis integration",
+    "Advanced stop-loss system"
+  ]
+}

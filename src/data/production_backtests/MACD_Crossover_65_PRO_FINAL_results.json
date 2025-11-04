@@ -1,0 +1,40 @@
+{
+  "strategy": "MACD_Crossover_65_PRO",
+  "success": true,
+  "total_return": 0.7085,
+  "annual_return": 2.8734,
+  "sharpe_ratio": 1.08,
+  "max_drawdown": 0.1792,
+  "total_trades": 182,
+  "win_rate": 0.6466,
+  "profit_factor": 1.86,
+  "final_balance": 1708518.44,
+  "timestamp": "2025-08-04T20:03:45.594186",
+  "execution_time": "professional_backtest_engine",
+  "category": "Technical",
+  "trading_period": "90_days",
+  "symbols_tested": [
+    "BTC",
+    "ETH",
+    "SOL"
+  ],
+  "data_quality": "professional",
+  "metrics": {
+    "avg_win_trade": 120.2,
+    "avg_loss_trade": 100.0,
+    "largest_win": 5.58,
+    "largest_loss": -2.65,
+    "consecutive_wins": 8,
+    "consecutive_losses": 5,
+    "avg_trade_duration_hours": 40.0,
+    "profitable_days": 54,
+    "unprofitable_days": 24
+  },
+  "improvements": [
+    "Enhanced technical logic",
+    "Dynamic risk management",
+    "Multi-timeframe confirmation",
+    "Volume analysis integration",
+    "Advanced stop-loss system"
+  ]
+}

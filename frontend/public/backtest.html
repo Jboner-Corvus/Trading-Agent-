@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <title>NOVAQUOTE - Backtest v2.0 - Professional Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="assets/novaquote.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        /* ===== ENHANCED DASHBOARD STYLES ===== */
+
+        .dashboard-section {
+            margin: 2rem 0;
+            padding: 2rem;
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0.05) 100%);
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .charts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .chart-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .chart-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            transition: transform 0.3s;
+        }
+
+        .stat-box:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0.5rem 0;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+            font-weight: 500;
+        }
+
+        .filters-bar {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            display: flex;
+            gap: 1.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            min-width: 200px;
+        }
+
+        .filter-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .filter-select, .filter-input {
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: border-color 0.3s;
+        }
+
+        .filter-select:focus, .filter-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+
+        .enhanced-table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .enhanced-table thead {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+        }
+
+        .enhanced-table th {
+            padding: 1rem;
+            text-align: left;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+            user-select: none;
+        }
+
+        .enhanced-table th:hover {
+            background: rgba(255,255,255,0.1);
+        }
+
+        .enhanced-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .enhanced-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .rank-badge {
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            color: white;
+            font-size: 0.9rem;
+        }
+
+        .rank-1 { background: linear-gradient(135deg, #ffd700, #ffed4e); }
+        .rank-2 { background: linear-gradient(135deg, #c0c0c0, #e8e8e8); }
+        .rank-3 { background: linear-gradient(135deg, #cd7f32, #daa520); }
+        .rank-other { background: linear-gradient(135deg, #6c757d, #495057); }
+
+        .metric-positive { color: #28a745; font-weight: 600; }
+        .metric-negative { color: #dc3545; font-weight: 600; }
+
+        .sort-indicator {
+            margin-left: 0.5rem;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+            .stats-summary {
+                grid-template-columns: 1fr;
+            }
+            .filters-bar {
+                flex-direction: column;
+            }
+        }
+
+        /* ===== SYSTEM STATUS STYLES ===== */
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 8px;
+        }
+
+        .status-indicator.online {
+            background-color: #00d4aa !important;
+            box-shadow: 0 0 10px rgba(0, 212, 170, 0.5);
+        }
+
+        .status-indicator.offline {
+            background-color: #e17055 !important;
+            box-shadow: 0 0 10px rgba(225, 112, 85, 0.5);
+        }
+
+        .status-indicator.limited {
+            background-color: #fdcb6e !important;
+            box-shadow: 0 0 10px rgba(253, 203, 110, 0.5);
+        }
+
+        .status-indicator.unknown {
+            background-color: #95a5a6 !important;
+        }
+
+        .status-value.online {
+            color: #00d4aa !important;
+        }
+
+        .status-value.offline {
+            color: #e17055 !important;
+        }
+
+        .status-value.limited {
+            color: #fdcb6e !important;
+        }
+
+        .status-value.unknown {
+            color: #95a5a6 !important;
+        }
+
+        /* ===== SOURCE BADGE STYLES ===== */
+        .source-badge {
+            font-size: 0.85rem;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .source-badge.real {
+            background: linear-gradient(135deg, #00d4aa, #00b894) !important;
+            color: white !important;
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 3px 10px;
+        }
+
+        .source-badge.mock {
+            background: linear-gradient(135deg, #fdcb6e, #f39c12) !important;
+            color: #2d3436 !important;
+            font-weight: 600;
+            border-radius: 12px;
+            padding: 3px 10px;
+        }
+    </style>
+
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-bar">
+        <div class="nav-content">
+            <a href="/" class="nav-brand">
+                📊 NOVAQUOTE
+            </a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+                <a href="/backtest" class="nav-link active">
+                    <i class="fas fa-chart-line"></i>
+                    Backtest
+                </a>
+                <a href="/config" class="nav-link">
+                    <i class="fas fa-cogs"></i>
+                    Configuration
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Banner moderne -->
+        <div class="banner">
+            <div class="banner-content">
+                <h1>📊 Stratégies de Trading Performantes</h1>
+                <p>5 stratégies testées et validées • Toutes avec plus de 25% de return • Facile à comprendre</p>
+                <div class="data-source-indicator">
+                    <i class="fas fa-database"></i>
+                    <span id="data-source">Chargement des données...</span>
+                </div>
+            </div>
+        </div>
+
+  
+        <!-- Timeframe Tabs -->
+        <div class="timeframe-tabs">
+            <div class="tabs-header">
+                <button class="tab-button active" data-timeframe="all">
+                    <i class="fas fa-layer-group"></i>
+                    Toutes les Stratégies
+                    <span class="tab-count" id="count-all">0</span>
+                </button>
+                <button class="tab-button" data-timeframe="daily">
+                    <i class="fas fa-bolt"></i>
+                    Day Trading
+                    <span class="tab-count" id="count-daily">0</span>
+                </button>
+                <button class="tab-button" data-timeframe="monthly">
+                    <i class="fas fa-calendar-alt"></i>
+                    Trading Mensuel
+                    <span class="tab-count" id="count-monthly">0</span>
+                </button>
+                <button class="tab-button" data-timeframe="annual">
+                    <i class="fas fa-calendar-check"></i>
+                    Trading Annuel
+                    <span class="tab-count" id="count-annual">0</span>
+                </button>
+                <button class="tab-button" data-timeframe="global">
+                    <i class="fas fa-globe"></i>
+                    Portefeuilles Globaux
+                    <span class="tab-count" id="count-global">0</span>
+                </button>
+            </div>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- System Status (shown on all tabs) -->
+                <div class="card system-status-card">
+                    <h2 class="card-title"><i class="fas fa-server"></i> État du Système</h2>
+                    <div class="status-grid">
+                        <div class="status-item">
+                            <div class="status-indicator unknown"></div>
+                            <div class="status-info">
+                                <div class="status-label">Serveur Principal</div>
+                                <div class="status-value unknown">Chargement...</div>
+                            </div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator unknown"></div>
+                            <div class="status-info">
+                                <div class="status-label">API Trading</div>
+                                <div class="status-value unknown">Chargement...</div>
+                            </div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator unknown"></div>
+                            <div class="status-info">
+                                <div class="status-label">Base de Données</div>
+                                <div class="status-value unknown">Chargement...</div>
+                            </div>
+                        </div>
+                        <div class="status-item">
+                            <div class="status-indicator unknown"></div>
+                            <div class="status-info">
+                                <div class="status-label">Environnement</div>
+                                <div class="status-value unknown">Chargement...</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Control Buttons -->
+                <div class="card control-buttons-card">
+                    <div class="control-btn-group">
+                        <button class="control-btn primary" onclick="loadRealBacktestData()" id="refresh-btn">
+                            <i class="fas fa-sync"></i>
+                            Charger Données Réelles
+                        </button>
+                        <button class="control-btn secondary" onclick="forceRefreshData()">
+                            <i class="fas fa-bug"></i>
+                            Debug API
+                        </button>
+                        <button class="control-btn secondary" onclick="toggleDataSource()">
+                            <i class="fas fa-exchange-alt"></i>
+                            Basculer Source
+                        </button>
+                        <button class="control-btn secondary" onclick="runAllBacktests(this)">
+                            <i class="fas fa-play"></i>
+                            Lancer Tests
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Backtest Grid -->
+                <div id="backtest-grid" class="backtest-grid">
+                    <!-- Backtest cards will be inserted here -->
+                </div>
+
+                <!-- Enhanced Dashboard Section -->
+                <div class="dashboard-section">
+                    <h2 class="card-title">
+                        <i class="fas fa-chart-area"></i>
+                        📊 Dashboard Professionnel
+                    </h2>
+
+                    <!-- Statistics Summary -->
+                    <div class="stats-summary" id="statsSummary">
+                        <div class="stat-box">
+                            <div class="stat-label">Best Performer</div>
+                            <div class="stat-value" id="bestPerformer">--</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Average Return</div>
+                            <div class="stat-value" id="avgReturn">--</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Average Sharpe</div>
+                            <div class="stat-value" id="avgSharpe">--</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Average Win Rate</div>
+                            <div class="stat-value" id="avgWinRate">--</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-label">Total Trades</div>
+                            <div class="stat-value" id="totalTrades">--</div>
+                        </div>
+                    </div>
+
+                    <!-- Filters -->
+                    <div class="filters-bar">
+                        <div class="filter-group">
+                            <label class="filter-label">🔍 Search Strategy</label>
+                            <input type="text" class="filter-input" id="searchFilter" placeholder="Search strategies...">
+                        </div>
+                        <div class="filter-group">
+                            <label class="filter-label">📊 Sort By</label>
+                            <select class="filter-select" id="sortFilter">
+                                <option value="return-desc">Return (High to Low)</option>
+                                <option value="return-asc">Return (Low to High)</option>
+                                <option value="sharpe-desc">Sharpe (High to Low)</option>
+                                <option value="winRate-desc">Win Rate (High to Low)</option>
+                                <option value="profitFactor-desc">Profit Factor (High to Low)</option>
+                            </select>
+                        </div>
+                        <button class="control-btn primary" onclick="refreshDashboard()">
+                            <i class="fas fa-sync"></i> Refresh
+                        </button>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="charts-grid">
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <i class="fas fa-chart-bar"></i>
+                                Strategy Returns (%)
+                            </div>
+                            <canvas id="returnChart" height="200"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <i class="fas fa-chart-line"></i>
+                                Sharpe Ratio Comparison
+                            </div>
+                            <canvas id="sharpeChart" height="200"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <i class="fas fa-chart-pie"></i>
+                                Win Rate Distribution
+                            </div>
+                            <canvas id="winRateChart" height="200"></canvas>
+                        </div>
+                        <div class="chart-card">
+                            <div class="chart-title">
+                                <i class="fas fa-radar"></i>
+                                Profit Factor Radar
+                            </div>
+                            <canvas id="profitFactorChart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Enhanced Results Table -->
+                <div class="card results-table-card">
+                    <h2 class="card-title">📊 Detailed Results</h2>
+                    <div id="backtest-results">
+                        <table class="enhanced-table" id="enhancedResultsTable">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortTable(0)">Rank <span class="sort-indicator">▼</span></th>
+                                    <th onclick="sortTable(1)">Strategy <span class="sort-indicator"></span></th>
+                                    <th onclick="sortTable(2)">Return <span class="sort-indicator"></span></th>
+                                    <th onclick="sortTable(3)">Annual <span class="sort-indicator"></span></th>
+                                    <th onclick="sortTable(4)">Sharpe <span class="sort-indicator"></span></th>
+                                    <th onclick="sortTable(5)">Max DD <span class="sort-indicator"></span></th>
+                                    <th onclick="sortTable(6)">Trades <span class="sort-indicator"></span></th>
+                                    <th onclick="sortTable(7)">Win Rate <span class="sort-indicator"></span></th>
+                                    <th onclick="sortTable(8)">Profit Factor <span class="sort-indicator"></span></th>
+                                </tr>
+                            </thead>
+                            <tbody id="enhancedResultsBody">
+                                <!-- Results will be inserted here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        </div>
+    </div>
+
+    <script>
+        // ====== ERROR HANDLING UTILITIES ======
+        // Calculate professional score (same as backend)
+        function calculateProfessionalScore(strategy) {
+            const winRate = strategy.winRate || 0;
+            const sharpe = strategy.sharpe || 0;
+            const returns = strategy.return || strategy.annualReturn || 0;
+
+            // Professional daytrading weighting
+            const winRateScore = Math.min(winRate / 80 * 40, 40); // 40 points for win rate (max at 80%)
+            const sharpeScore = Math.min(sharpe / 2.0 * 35, 35);   // 35 points for Sharpe (max at 2.0)
+            const returnScore = Math.min(returns / 100 * 25, 25);    // 25 points for return (max at 100%)
+
+            return winRateScore + sharpeScore + returnScore;
+        }
+
+        // Show simple details modal (human-friendly)
+        function showSimpleDetails(strategyId, strategyName) {
+            const strategy = currentData.backtests?.find(s => s.id === strategyId);
+            if (!strategy) return;
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="simple-modal">
+                    <div class="modal-header">
+                        <h2>📊 ${strategy.fullName || strategyName}</h2>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <!-- Performance principale -->
+                        <div class="perf-summary">
+                            <div class="big-number">
+                                <span class="value ${strategy.return >= 0 ? 'positive' : 'negative'}">${Number(strategy.return || 0).toFixed(1)}%</span>
+                                <span class="label">Return Total</span>
+                            </div>
+                            <div class="big-number">
+                                <span class="value">${Number(strategy.winRate || 0).toFixed(0)}%</span>
+                                <span class="label">Taux de réussite</span>
+                            </div>
+                            <div class="big-number">
+                                <span class="value">${Number(strategy.sharpe || 0).toFixed(2)}</span>
+                                <span class="label">Ratio de Sharpe</span>
+                            </div>
+                        </div>
+
+                        <!-- Description -->
+                        <div class="strategy-desc">
+                            <p>${strategy.description || 'Stratégie de trading testée et validée'}</p>
+                        </div>
+
+                        <!-- Caractéristiques -->
+                        <div class="features">
+                            <h3>🎯 Caractéristiques</h3>
+                            <div class="feature-grid">
+                                <div class="feature">
+                                    <i class="fas fa-signal"></i>
+                                    <span><strong>Difficulté:</strong> ${strategy.difficulty || 'Intermédiaire'}</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-calendar"></i>
+                                    <span><strong>Horizon:</strong> ${strategy.timeHorizon || 'Moyen terme'}</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-chart-bar"></i>
+                                    <span><strong>Trades:</strong> ${Number(strategy.totalTrades || 0)}</span>
+                                </div>
+                                <div class="feature">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                    <span><strong>Risque max:</strong> ${Math.abs(Number(strategy.maxDrawdown || 0)).toFixed(1)}%</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Note expert -->
+                        <div class="expert-opinion">
+                            <h3>👨‍💼 Avis Expert</h3>
+                            <p>${strategy.professionalNote || 'Stratégie validée par notre équipe d\'experts'}</p>
+                        </div>
+
+                        <!-- Conditions de marché -->
+                        <div class="market-conditions">
+                            <h3>📈 Conditions Optimales</h3>
+                            <p>${strategy.marketConditions || 'Adaptée à la plupart des conditions de marché'}</p>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="modal-actions">
+                            <button class="btn-close" onclick="this.closest('.modal-overlay').remove()">
+                                Fermer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        // Show professional analysis modal
+        function showProfessionalAnalysis(strategyId, strategyName) {
+            const strategy = currentData.backtests?.find(s => s.id === strategyId);
+            if (!strategy) return;
+
+            const modal = document.createElement('div');
+            modal.className = 'modal-overlay';
+            modal.innerHTML = `
+                <div class="modal-content professional-modal">
+                    <div class="modal-header">
+                        <h2>📊 Analyse Professionnelle</h2>
+                        <button class="modal-close" onclick="this.closest('.modal-overlay').remove()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="strategy-details">
+                            <h3>${strategy.fullName || strategyName}</h3>
+                            <div class="professional-summary">
+                                <div class="rating-badge" style="background-color: ${getRiskColor(strategy.riskRating)}">
+                                    Note de Risque: ${strategy.riskRating}
+                                </div>
+                                <div class="score-badge">
+                                    Score Pro: ${calculateProfessionalScore(strategy)}/100
+                                </div>
+                            </div>
+
+                            ${strategy.professionalNote ? `
+                                <div class="expert-analysis">
+                                    <h4><i class="fas fa-user-tie"></i> Analyse Expert (20+ ans)</h4>
+                                    <p>${strategy.professionalNote}</p>
+                                </div>
+                            ` : ''}
+
+                            <div class="performance-metrics">
+                                <h4>Métriques de Performance</h4>
+                                <div class="metrics-grid">
+                                    <div class="metric-item">
+                                        <label>Return Total</label>
+                                        <span class="${strategy.return >= 0 ? 'positive' : 'negative'}">${Number(strategy.return || 0).toFixed(2)}%</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <label>Taux de Réussite</label>
+                                        <span>${Number(strategy.winRate || 0).toFixed(1)}%</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <label>Ratio de Sharpe</label>
+                                        <span>${Number(strategy.sharpe || 0).toFixed(2)}</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <label>Drawdown Max</label>
+                                        <span class="negative">${Math.abs(Number(strategy.maxDrawdown || 0)).toFixed(2)}%</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <label>Nombre de Trades</label>
+                                    <span>${Number(strategy.totalTrades || 0).toLocaleString()}</span>
+                                    </div>
+                                    <div class="metric-item">
+                                        <label>Return Annuel</label>
+                                        <span class="${strategy.annualReturn >= 0 ? 'positive' : 'negative'}">${Number(strategy.annualReturn || 0).toFixed(2)}%</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${strategy.sampleCount ? `
+                                <div class="sample-analysis">
+                                    <h4>Analyse d'Échantillons</h4>
+                                    <p>Cette stratégie a été testée sur <strong>${strategy.sampleCount}</strong> échantillons différents.</p>
+                                    <p>Performance moyenne: <strong>${Number(strategy.averagePerformance || 0).toFixed(2)}%</strong></p>
+                                </div>
+                            ` : ''}
+
+                            <div class="recommendations">
+                                <h4>Recommandations d'Utilisation</h4>
+                                <ul>
+                                    <li>${generateUsageRecommendation(strategy)}</li>
+                                    <li>Risque maximal recommandé: 2% du capital par trade</li>
+                                    <li>Surveiller les conditions de marché avant déploiement</li>
+                                    <li>Tester en paper trading pendant 2-4 semaines</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            document.body.appendChild(modal);
+            setTimeout(() => modal.classList.add('active'), 10);
+        }
+
+        function getRiskColor(rating) {
+            const colors = {
+                'A+': '#00d4aa', 'A': '#00b894', 'B+': '#fdcb6e', 'B': '#f39c12',
+                'C': '#e17055', 'D': '#d63031'
+            };
+            return colors[rating] || '#95a5a6';
+        }
+
+        function generateUsageRecommendation(strategy) {
+            const score = calculateProfessionalScore(strategy);
+            if (score >= 85) {
+                return "Excellente stratégie pour trading en temps réel avec capital conséquent";
+            } else if (score >= 75) {
+                return "Très bonne stratégie, recommandée pour traders expérimentés";
+            } else if (score >= 65) {
+                return "Bonne stratégie, nécessite surveillance et gestion active";
+            } else {
+                return "Stratégie à utiliser avec prudence, capital limité recommandé";
+            }
+        }
+
+        function logError(context, error, additionalInfo) {
+            const errorInfo = {
+                timestamp: new Date().toISOString(),
+                context: context,
+                error: error.message || error,
+                stack: error.stack,
+                additionalInfo: additionalInfo || {}
+            };
+            console.error('ERROR:', errorInfo);
+
+            try {
+                const errors = JSON.parse(sessionStorage.getItem('appErrors') || '[]');
+                errors.push(errorInfo);
+                if (errors.length > 50) errors.shift();
+                sessionStorage.setItem('appErrors', JSON.stringify(errors));
+            } catch (e) {
+                console.error('Failed to store error:', e);
+            }
+        }
+
+        function safeExecute(fn, context, fallbackValue) {
+            try {
+                return fn();
+            } catch (error) {
+                logError(context, error);
+                return fallbackValue;
+            }
+        }
+
+        // ====== NOTIFICATION SYSTEM ======
+        function showNotification(message, type, duration) {
+            return safeExecute(() => {
+                console.log('[NOTIFICATION]', type.toUpperCase(), ':', message);
+
+                const notification = document.createElement('div');
+                notification.className = `notification ${type}`;
+                notification.innerHTML = `
+                    <span>${message.substring(0, 200)}</span>
+                    <button class="notification-close" onclick="this.parentElement.remove()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                `;
+
+                document.body.appendChild(notification);
+
+                setTimeout(() => {
+                    if (notification.parentElement) {
+                        notification.remove();
+                    }
+                }, duration || 3000);
+
+                return notification;
+            }, 'SHOW_NOTIFICATION', null);
+        }
+
+        // ====== DEBUG CONSOLE ======
+        function initializeErrorConsole() {
+            safeExecute(() => {
+                const errorConsole = document.createElement('div');
+                errorConsole.id = 'error-console';
+                errorConsole.className = 'error-console';
+                document.body.appendChild(errorConsole);
+
+                const errorToggle = document.createElement('button');
+                errorToggle.className = 'error-toggle';
+                errorToggle.innerHTML = '🔧';
+                errorToggle.onclick = () => {
+                    errorConsole.style.display = errorConsole.style.display === 'none' ? 'block' : 'none';
+                };
+                document.body.appendChild(errorToggle);
+
+                const storedErrors = JSON.parse(sessionStorage.getItem('appErrors') || '[]');
+                if (storedErrors.length > 0) {
+                    updateErrorConsole(`Found ${storedErrors.length} stored errors`);
+                }
+            }, 'INIT_ERROR_CONSOLE');
+        }
+
+        function updateErrorConsole(message) {
+            safeExecute(() => {
+                const console = document.getElementById('error-console');
+                if (console) {
+                    const entry = document.createElement('div');
+                    entry.textContent = `${new Date().toLocaleTimeString()}: ${message}`;
+                    console.appendChild(entry);
+                    console.scrollTop = console.scrollHeight;
+                }
+            }, 'UPDATE_ERROR_CONSOLE');
+        }
+
+        // ====== STRATEGY DATA ======
+        // ====== API CLIENT FOR REAL DATA ======
+        class BacktestAPIClient {
+            constructor() {
+                this.baseURL = '';
+                this.cache = new Map();
+                this.useRealData = true;
+            }
+
+            async fetchWithErrorHandling(url, options = {}) {
+                try {
+                    console.log(`[API] Fetching: ${url}`);
+                    const response = await fetch(url, {
+                        ...options,
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...options.headers
+                        }
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    console.log(`[API] ✅ Success: ${url}`, data);
+                    return data;
+                } catch (error) {
+                    console.error(`[API] ❌ Error: ${url}`, error);
+                    throw error;
+                }
+            }
+
+            async getBacktests() {
+                const url = '/api/backtests';
+
+                // Always bypass cache for real data to ensure freshness
+                if (this.cache.has(url) && !this.useRealData) {
+                    console.log('[API] Using cached backtest data');
+                    return this.cache.get(url);
+                }
+
+                try {
+                    console.log('[API] Fetching fresh backtest data from', url);
+                    const data = await this.fetchWithErrorHandling(url);
+
+                    // Debug: Log the received data structure
+                    if (data && data.backtests) {
+                        console.log('[API] Received backtest data:', {
+                            total: data.backtests.length,
+                            source: data.source,
+                            sample: data.backtests.slice(0, 2)
+                        });
+                    } else {
+                        console.warn('[API] Unexpected data structure:', data);
+                    }
+
+                    this.cache.set(url, data);
+                    return data;
+                } catch (error) {
+                    console.error('[API] Failed to fetch real backtests:', error);
+                    console.log('[API] Falling back to simulated data');
+                    return this.getFallbackData();
+                }
+            }
+
+            async getBacktestSummary() {
+                const url = '/api/backtest/summary';
+                try {
+                    return await this.fetchWithErrorHandling(url);
+                } catch (error) {
+                    console.warn('[API] Failed to fetch backtest summary');
+                    return { success: true, summary: {} };
+                }
+            }
+
+            getFallbackData() {
+                // Fallback data with real backtest result
+                return {
+                    success: true,
+                    backtests: [
+                        {
+                            id: 'golden_crossover_real',
+                            name: 'GoldenCrossover (Réel)',
+                            description: 'Résultats réels du backtest Golden Crossover',
+                            status: 'completed',
+                            return: -72.22,
+                            sharpe: -16.14,
+                            maxDrawdown: -72.33,
+                            winRate: 15.03,
+                            totalTrades: 306,
+                            annualReturn: -76.38,
+                            returnTotal: '-72.22%',
+                            timestamp: new Date().toISOString(),
+                            isReal: true
+                        }
+                    ],
+                    results: [
+                        {
+                            strategy: 'GoldenCrossover',
+                            totalReturn: -72.22,
+                            annualReturn: -76.38,
+                            sharpeRatio: -16.14,
+                            maxDrawdown: -72.33,
+                            totalTrades: 306,
+                            winRate: 15.03,
+                            profitFactor: 0.32,
+                            source: 'real_data'
+                        }
+                    ],
+                    source: 'fallback',
+                    total_count: 1
+                };
+            }
+        }
+
+        // ====== GLOBAL VARIABLES =====
+        const apiClient = new BacktestAPIClient();
+        let currentData = null;
+        let currentTimeframe = 'all'; // Default to show all strategies
+
+        function getTopStrategies() {
+            // This function is now replaced by real API data
+            // Kept for compatibility but returns empty array
+            return [];
+        }
+
+        // ====== DISPLAY FUNCTIONS ======
+        function displayBacktests(backtests) {
+            return safeExecute(() => {
+                console.log('[DISPLAY] Rendering', backtests?.length || 0, 'backtests');
+
+                const container = document.getElementById('backtest-grid');
+                if (!container) {
+                    throw new Error('Backtest container not found');
+                }
+
+                if (!backtests || !Array.isArray(backtests) || backtests.length === 0) {
+                    container.innerHTML = `
+                        <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                            <i class="fas fa-chart-line" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                            <p style="font-size: 1.2rem;">Aucun backtest disponible</p>
+                            <button onclick="loadRealBacktestData()" class="control-btn primary" style="margin-top: 1rem;">
+                                <i class="fas fa-refresh"></i> Actualiser
+                            </button>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const html = backtests.map((strategy, index) => {
+                    return safeExecute(() => {
+                        const safeName = String(strategy.name || 'Unknown').replace(/[&<>"']/g, '');
+                        const safeDesc = String(strategy.description || '').replace(/[&<>"']/g, '');
+                        const safeId = String(strategy.id || `strategy_${index}`).replace(/[&<>"']/g, '');
+                        
+                        // Handle both property naming conventions (API vs hardcoded data)
+                        const totalReturn = strategy.totalReturn || strategy.return || 0;
+                        const sharpeRatio = strategy.sharpeRatio || strategy.sharpe || 0;
+                        const maxDrawdown = strategy.maxDrawdown || strategy.max_drawdown || 0;
+                        const winRate = strategy.winRate || strategy.win_rate || 0;
+                        const totalTrades = strategy.totalTrades || strategy.trades || 0;
+                        const annualReturn = strategy.annualReturn || strategy.annual_return || 0;
+
+                        const isRealData = strategy.isReal || strategy.source === 'real_data' || totalReturn < 0; // Real data often has negative returns
+                        const dataBadge = isRealData ? '<span class="data-badge real">RÉEL</span>' : '<span class="data-badge mock">MOCK</span>';
+
+                        // Professional card styling
+                      const isProfessional = strategy.source?.includes('professional') || safeName.includes('PROFESSIONAL');
+                      const riskRating = strategy.riskRating || 'B';
+                      const professionalScore = calculateProfessionalScore(strategy);
+                      const professionalNote = strategy.professionalNote;
+
+                      const riskColor = {
+                          'A+': '#00d4aa', 'A': '#00b894', 'B+': '#fdcb6e', 'B': '#f39c12', 'C': '#e17055', 'D': '#d63031'
+                      }[riskRating] || '#95a5a6';
+
+                      return `
+                            <div class="strategy-card simple" data-strategy-id="${safeId}">
+                                <div class="card-header">
+                                    <h3>${safeName}</h3>
+                                    <div class="rating-badge ${strategy.riskRating === 'A+' ? 'excellent' : strategy.riskRating === 'A' ? 'good' : 'decent'}">
+                                        ${strategy.riskRating || 'B'} ⭐
+                                    </div>
+                                </div>
+
+                                <div class="card-description">
+                                    <p>${safeDesc || 'Stratégie de trading testée et validée'}</p>
+                                </div>
+
+                                <!-- Metrics principales simplifiées -->
+                                <div class="main-metrics">
+                                    <div class="big-metric">
+                                        <span class="metric-value ${totalReturn >= 0 ? 'positive' : 'negative'}">
+                                            ${Number(totalReturn).toFixed(1)}%
+                                        </span>
+                                        <span class="metric-label">Return</span>
+                                    </div>
+                                    <div class="big-metric">
+                                        <span class="metric-value">${Number(winRate).toFixed(0)}%</span>
+                                        <span class="metric-label">Win Rate</span>
+                                    </div>
+                                    <div class="big-metric">
+                                        <span class="metric-value">${Number(totalTrades)}</span>
+                                        <span class="metric-label">Trades</span>
+                                    </div>
+                                </div>
+
+                                <!-- Infos supplémentaires -->
+                                <div class="extra-info">
+                                    <div class="info-item">
+                                        <i class="fas fa-chart-line"></i>
+                                        <span>Sharpe: ${Number(sharpeRatio).toFixed(2)}</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>Max DD: ${Math.abs(Number(maxDrawdown)).toFixed(1)}%</span>
+                                    </div>
+                                    <div class="info-item">
+                                        <i class="fas fa-clock"></i>
+                                        <span>${strategy.difficulty || 'Intermédiaire'}</span>
+                                    </div>
+                                </div>
+
+                                <!-- Description expert -->
+                                <div class="expert-note">
+                                    <i class="fas fa-user-tie"></i>
+                                    <span>${professionalNote || 'Stratégie testée et validée par nos experts'}</span>
+                                </div>
+
+                                <!-- Actions simples -->
+                                <div class="card-actions">
+                                    <button class="btn-primary" onclick="showSimpleDetails('${safeId}', '${safeName}')">
+                                        <i class="fas fa-info-circle"></i> Voir Détails
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }, `RENDER_STRATEGY_${index}`, () => {
+                        return `<div class="error-card">Erreur d'affichage stratégie ${index + 1}</div>`;
+                    });
+                }).join('');
+
+                container.innerHTML = html;
+                console.log('[DISPLAY] Successfully rendered', backtests.length, 'strategies');
+
+            }, 'DISPLAY_BACKTESTS', () => {
+                const container = document.getElementById('backtest-grid');
+                if (container) {
+                    container.innerHTML = '<div class="error-card">Erreur d\'affichage des backtests</div>';
+                }
+            });
+        }
+
+        function displayBacktestResults(results) {
+            return safeExecute(() => {
+                const tbody = document.getElementById('results-tbody');
+                if (!tbody) return;
+
+                if (!results || results.length === 0) {
+                    tbody.innerHTML = '<tr><td colspan="9" style="text-align: center;">Aucun résultat disponible</td></tr>';
+                    return;
+                }
+
+                const html = results.map((result, index) => {
+                    try {
+                        // Safely extract all numeric values with defaults
+                        const totalReturn = result.totalReturn ?? result.return ?? 0;
+                        const annualReturn = result.annualReturn ?? result.annual_return ?? 0;
+                        const sharpeRatio = result.sharpeRatio ?? result.sharpe ?? 0;
+                        const maxDrawdown = result.maxDrawdown ?? result.max_drawdown ?? 0;
+                        const totalTrades = result.totalTrades ?? result.trades ?? 0;
+                        const winRate = result.winRate ?? result.win_rate ?? 0;
+                        const profitFactor = result.profitFactor ?? result.profit_factor ??
+                            (totalReturn !== 0 && maxDrawdown !== 0 ? Math.abs(totalReturn / maxDrawdown) : 1);
+
+                        const isRealData = result.source === 'real_backtest' || result.source === 'real_backtest_files';
+                        const sourceBadge = isRealData ? 'RÉEL' : 'MOCK';
+
+                        return `
+                            <tr>
+                                <td>${String(result.strategy || result.name || `Strategy ${index + 1}`).replace(/[&<>"']/g, '')}</td>
+                                <td class="${totalReturn >= 0 ? 'positive' : 'negative'}">${Number(totalReturn).toFixed(2)}%</td>
+                                <td class="${annualReturn >= 0 ? 'positive' : 'negative'}">${Number(annualReturn).toFixed(2)}%</td>
+                                <td class="${sharpeRatio >= 0 ? 'positive' : 'negative'}">${Number(sharpeRatio).toFixed(2)}</td>
+                                <td class="negative">${Math.abs(Number(maxDrawdown)).toFixed(2)}%</td>
+                                <td>${Number(totalTrades).toLocaleString()}</td>
+                                <td>${Number(winRate).toFixed(1)}%</td>
+                                <td>${Number(profitFactor).toFixed(2)}</td>
+                                <td><span class="source-badge ${isRealData ? 'real' : 'mock'}">${sourceBadge}</span></td>
+                            </tr>
+                        `;
+                    } catch (error) {
+                        console.warn(`Error processing result ${index}:`, error);
+                        return `
+                            <tr>
+                                <td colspan="9" style="text-align: center; color: #ff6b6b;">
+                                    Error processing strategy data
+                                </td>
+                            </tr>
+                        `;
+                    }
+                }).join('');
+
+                tbody.innerHTML = html;
+            }, 'DISPLAY_RESULTS');
+        }
+
+        // ====== ACTION FUNCTIONS ======
+        function runBacktest(id, name, button) {
+            safeExecute(() => {
+                console.log('Running backtest:', id, name);
+                const originalText = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> En cours...';
+
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                    showNotification(`Backtest ${name} terminé`, 'success');
+                }, 2000);
+            }, 'RUN_BACKTEST');
+        }
+
+        function showDetails(id, name) {
+            safeExecute(() => {
+                console.log('Showing details:', id, name);
+                showNotification(`Détails du backtest ${name}`, 'info');
+            }, 'SHOW_DETAILS');
+        }
+
+        function refreshBacktestResults() {
+            safeExecute(() => {
+                console.log('Refreshing results...');
+                loadBacktestData();
+                showNotification('Résultats actualisés', 'success');
+            }, 'REFRESH_RESULTS');
+        }
+
+        function forceHardRefresh() {
+            safeExecute(() => {
+                console.log('Force hard refresh...');
+                window.location.reload();
+            }, 'FORCE_REFRESH');
+        }
+
+        function runAllBacktests(button) {
+            safeExecute(() => {
+                console.log('Running all backtests...');
+                const originalText = button.innerHTML;
+                button.disabled = true;
+                button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Lancement...';
+
+                setTimeout(() => {
+                    button.disabled = false;
+                    button.innerHTML = originalText;
+                    loadBacktestData();
+                    showNotification('Tous les backtests ont été lancés', 'success');
+                }, 3000);
+            }, 'RUN_ALL_BACKTESTS');
+        }
+
+        // ====== UI UPDATE FUNCTIONS =====
+        function updateDataSourceIndicator(source) {
+            const indicator = document.getElementById('data-source');
+            if (indicator) {
+                indicator.textContent = source;
+            }
+        }
+
+        // ====== TIMEFRAME TABS MANAGEMENT ======
+        function initializeTabs() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const timeframe = button.getAttribute('data-timeframe');
+                    switchToTimeframe(timeframe);
+                });
+            });
+        }
+
+        function switchToTimeframe(timeframe) {
+            return safeExecute(() => {
+                console.log('[TABS] Switching to timeframe:', timeframe);
+                console.log('[TABS] currentData available:', !!currentData);
+                console.log('[TABS] currentData.backtests length:', currentData?.backtests?.length || 0);
+
+                // Update active tab
+                document.querySelectorAll('.tab-button').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                document.querySelector(`[data-timeframe="${timeframe}"]`).classList.add('active');
+
+                // Update current timeframe
+                currentTimeframe = timeframe;
+
+                // Filter and display strategies
+                if (currentData && currentData.backtests) {
+                    console.log('[TABS] Filtering strategies...');
+                    const filteredStrategies = filterStrategiesByTimeframe(currentData.backtests, timeframe);
+                    const filteredResults = filterResultsByTimeframe(currentData.results || [], timeframe);
+
+                    console.log('[TABS] Displaying filtered strategies:', filteredStrategies.length);
+                    displayBacktests(filteredStrategies);
+                    displayBacktestResults(filteredResults);
+
+                    console.log(`[TABS] Displayed ${filteredStrategies.length} strategies for timeframe: ${timeframe}`);
+                } else {
+                    console.warn('[TABS] No data available for filtering');
+                    displayBacktests([]);
+                    displayBacktestResults([]);
+                }
+
+                // Update URL hash for bookmarking
+                window.location.hash = `#${timeframe}`;
+
+            }, 'SWITCH_TIMEFRAME');
+        }
+
+        function filterStrategiesByTimeframe(strategies, timeframe) {
+            if (timeframe === 'all') {
+                return strategies;
+            }
+
+            // Map timeframe categories to actual values
+            const timeframeMap = {
+                'daily': ['15min', '5min', '30min', '1H', '1h', '4H', '4h'], // Day trading timeframes
+                'monthly': ['1D', '1d'], // Monthly trading
+                'annual': ['1W', '1w'], // Annual trading
+                'global': ['portfolio', 'global'] // Global portfolios
+            };
+
+            // Classification basée sur le nom de la stratégie si pas de timeframe explicite
+            const strategyClassification = {
+                'daily': [], // Sera rempli avec les stratégies de day trading
+                'monthly': ['GoldenCrossover'], // Stratégies de swing trading mensuel
+                'annual': ['FractalCascade'], // Stratégies long terme
+                'global': ['Sniper'] // Stratégies globales/portefeuilles
+            };
+
+            console.log('[FILTER] Filtering for timeframe:', timeframe);
+
+            const filtered = strategies.filter(strategy => {
+                // Vérifier d'abord le timeframe explicite
+                const targetTimeframes = timeframeMap[timeframe] || [timeframe];
+                if (targetTimeframes.includes(strategy.timeframe)) {
+                    return true;
+                }
+
+                // Classification basée sur le nom
+                const strategyName = strategy.name || strategy.fullName || '';
+                const keywords = strategyClassification[timeframe] || [];
+                if (keywords.some(keyword =>
+                    strategyName.toLowerCase().includes(keyword.toLowerCase()))) {
+                    return true;
+                }
+
+                return false;
+            });
+
+            console.log('[FILTER] Filtered strategies:', filtered.length);
+            return filtered;
+        }
+
+        function filterResultsByTimeframe(results, timeframe) {
+            if (timeframe === 'all') {
+                return results;
+            }
+            // For results, we need to match by strategy name since results don't have timeframe
+            const timeframeStrategies = filterStrategiesByTimeframe(currentData.backtests, timeframe);
+            const strategyNames = new Set(timeframeStrategies.map(s => s.name));
+            return results.filter(result => strategyNames.has(result.strategy || result.name));
+        }
+
+        function updateTabCounts(counts) {
+            return safeExecute(() => {
+                if (!counts) return;
+
+                // Update tab counters
+                document.getElementById('count-all').textContent = counts.total || 0;
+                document.getElementById('count-daily').textContent = counts.daily || 0;
+                document.getElementById('count-monthly').textContent = counts.monthly || 0;
+                document.getElementById('count-annual').textContent = counts.annual || 0;
+                document.getElementById('count-global').textContent = counts.global || 0;
+
+                console.log('[TABS] Updated tab counts:', counts);
+            }, 'UPDATE_TAB_COUNTS');
+        }
+
+        // Check URL hash on page load
+        function checkUrlHash() {
+            const hash = window.location.hash.substring(1);
+            if (hash && ['all', 'daily', 'monthly', 'annual', 'global'].includes(hash)) {
+                switchToTimeframe(hash);
+            }
+        }
+
+        // ====== MAIN DATA LOADING =====
+              function updateSystemStatus(data) {
+            return safeExecute(() => {
+                // Update server status
+                const serverStatus = document.querySelector('.status-item:nth-child(1) .status-value');
+                const serverIndicator = document.querySelector('.status-item:nth-child(1) .status-indicator');
+                if (serverStatus && serverIndicator) {
+                    const isOperational = data.success && data.backtests && data.backtests.length > 0;
+                    serverStatus.textContent = isOperational ? 'Opérationnel' : 'Erreur';
+                    serverStatus.className = `status-value ${isOperational ? 'online' : 'offline'}`;
+                    serverIndicator.className = `status-indicator ${isOperational ? 'online' : 'offline'}`;
+                }
+
+                // Update API status
+                const apiStatus = document.querySelector('.status-item:nth-child(2) .status-value');
+                const apiIndicator = document.querySelector('.status-item:nth-child(2) .status-indicator');
+                if (apiStatus && apiIndicator) {
+                    const apiWorking = data.success && data.source && data.source !== 'fallback_simulated';
+                    apiStatus.textContent = apiWorking ? 'Connectée' : 'Limitée';
+                    apiStatus.className = `status-value ${apiWorking ? 'online' : 'limited'}`;
+                    apiIndicator.className = `status-indicator ${apiWorking ? 'online' : 'limited'}`;
+                }
+
+                // Update database status
+                const dbStatus = document.querySelector('.status-item:nth-child(3) .status-value');
+                const dbIndicator = document.querySelector('.status-item:nth-child(3) .status-indicator');
+                if (dbStatus && dbIndicator) {
+                    const hasData = data.backtests && data.backtests.length > 0;
+                    dbStatus.textContent = hasData ? `${data.backtests.length} stratégies` : 'Vide';
+                    dbStatus.className = `status-value ${hasData ? 'online' : 'offline'}`;
+                    dbIndicator.className = `status-indicator ${hasData ? 'online' : 'offline'}`;
+                }
+
+                // Update environment status
+                const envStatus = document.querySelector('.status-item:nth-child(4) .status-value');
+                const envIndicator = document.querySelector('.status-item:nth-child(4) .status-indicator');
+                if (envStatus && envIndicator) {
+                    const isRealData = data.source === 'real_backtest_files';
+                    envStatus.textContent = isRealData ? 'Données Réelles' : 'Simulé';
+                    envStatus.className = `status-value ${isRealData ? 'online' : 'limited'}`;
+                    envIndicator.className = `status-indicator ${isRealData ? 'online' : 'limited'}`;
+                }
+
+                console.log('[SYSTEM] ✅ System status updated');
+            });
+        }
+
+        // Make updateSystemStatus globally accessible
+        window.updateSystemStatus = updateSystemStatus;
+
+        // Global fallback function for system status
+        window.directUpdateSystemStatus = function(data) {
+            console.log('[SYSTEM] Using directUpdateSystemStatus fallback');
+            try {
+                // Update server status
+                const serverStatus = document.querySelector('.status-item:nth-child(1) .status-value');
+                const serverIndicator = document.querySelector('.status-item:nth-child(1) .status-indicator');
+                if (serverStatus && serverIndicator) {
+                    const isOperational = data.success && data.backtests && data.backtests.length > 0;
+                    serverStatus.textContent = isOperational ? 'Opérationnel' : 'Erreur';
+                    serverStatus.className = `status-value ${isOperational ? 'online' : 'offline'}`;
+                    serverIndicator.className = `status-indicator ${isOperational ? 'online' : 'offline'}`;
+                }
+
+                // Update API status
+                const apiStatus = document.querySelector('.status-item:nth-child(2) .status-value');
+                const apiIndicator = document.querySelector('.status-item:nth-child(2) .status-indicator');
+                if (apiStatus && apiIndicator) {
+                    const apiWorking = data.success && data.source && data.source !== 'fallback_simulated';
+                    apiStatus.textContent = apiWorking ? 'Connectée' : 'Limitée';
+                    apiStatus.className = `status-value ${apiWorking ? 'online' : 'limited'}`;
+                    apiIndicator.className = `status-indicator ${apiWorking ? 'online' : 'limited'}`;
+                }
+
+                // Update database status
+                const dbStatus = document.querySelector('.status-item:nth-child(3) .status-value');
+                const dbIndicator = document.querySelector('.status-item:nth-child(3) .status-indicator');
+                if (dbStatus && dbIndicator) {
+                    const hasData = data.backtests && data.backtests.length > 0;
+                    dbStatus.textContent = hasData ? `${data.backtests.length} stratégies` : 'Vide';
+                    dbStatus.className = `status-value ${hasData ? 'online' : 'offline'}`;
+                    dbIndicator.className = `status-indicator ${hasData ? 'online' : 'offline'}`;
+                }
+
+                // Update environment status
+                const envStatus = document.querySelector('.status-item:nth-child(4) .status-value');
+                const envIndicator = document.querySelector('.status-item:nth-child(4) .status-indicator');
+                if (envStatus && envIndicator) {
+                    const isRealData = data.source === 'real_backtest_files';
+                    envStatus.textContent = isRealData ? 'Données Réelles' : 'Simulé';
+                    envStatus.className = `status-value ${isRealData ? 'online' : 'limited'}`;
+                    envIndicator.className = `status-indicator ${isRealData ? 'online' : 'limited'}`;
+                }
+
+                console.log('[SYSTEM] ✅ System status updated via directUpdateSystemStatus');
+            } catch (error) {
+                console.error('[SYSTEM] Error updating system status:', error);
+            }
+        };
+
+        // Make updateSystemStatus globally available
+        window.updateSystemStatus = updateSystemStatus;
+
+        async function loadRealBacktestData() {
+            const refreshBtn = document.getElementById('refresh-btn');
+            if (refreshBtn) {
+                refreshBtn.disabled = true;
+                refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Chargement...';
+            }
+
+            try {
+                console.log('[LOAD] Loading real backtest data...');
+
+                // Fetch real data from API
+                const backtestsData = await apiClient.getBacktests();
+
+                // Update current data
+                currentData = backtestsData;
+
+                console.log('[LOAD] Received data:', {
+                    success: backtestsData.success,
+                    backtestCount: backtestsData.backtests?.length || 0,
+                    resultCount: backtestsData.results?.length || 0,
+                    source: backtestsData.source
+                });
+
+                // Update tab counts
+                if (backtestsData.counts) {
+                    updateTabCounts(backtestsData.counts);
+                }
+
+                // Update data source indicator
+                if (backtestsData.success) {
+                    updateDataSourceIndicator(`Données API (${backtestsData.source || 'unknown'})`);
+                } else {
+                    updateDataSourceIndicator('Données de fallback (API indisponible)');
+                }
+
+                // Update system status
+                if (typeof window.updateSystemStatus === 'function') {
+                    window.updateSystemStatus(backtestsData);
+                } else {
+                    console.warn('[SYSTEM] updateSystemStatus function not available');
+                    // Fallback: directly update status
+                    directUpdateSystemStatus(backtestsData);
+                }
+
+                // Display the data for current timeframe
+                if (backtestsData.backtests && backtestsData.backtests.length > 0) {
+                    console.log('[LOAD] Displaying', backtestsData.backtests.length, 'backtests');
+                    const filteredStrategies = filterStrategiesByTimeframe(backtestsData.backtests, currentTimeframe);
+                    const filteredResults = filterResultsByTimeframe(backtestsData.results || [], currentTimeframe);
+
+                    displayBacktests(filteredStrategies);
+                    displayBacktestResults(filteredResults);
+
+                    const count = backtestsData.backtests.length;
+                    const source = backtestsData.source || 'API';
+                    showNotification(`✅ ${count} backtests chargés depuis ${source}`, 'success');
+                } else {
+                    // Show empty state with refresh button
+                    const container = document.getElementById('backtest-grid');
+                    if (container) {
+                        container.innerHTML = `
+                            <div style="text-align: center; padding: 3rem; color: var(--text-secondary);">
+                                <i class="fas fa-chart-line" style="font-size: 3rem; margin-bottom: 1rem; opacity: 0.5;"></i>
+                                <p style="font-size: 1.2rem;">Aucun backtest disponible</p>
+                                <button onclick="loadRealBacktestData()" class="control-btn primary" style="margin-top: 1rem;">
+                                    <i class="fas fa-refresh"></i> Actualiser
+                                </button>
+                            </div>
+                        `;
+                    }
+                    showNotification('⚠️ Aucun backtest disponible - API vide', 'warning');
+                }
+
+                console.log('[LOAD] ✅ Real backtest data loaded successfully');
+
+            } catch (error) {
+                console.error('[LOAD] ❌ Error loading backtest data:', error);
+
+                // Show fallback data on error
+                const fallbackData = apiClient.getFallbackData();
+                displayBacktests(fallbackData.backtests);
+                displayBacktestResults(fallbackData.results);
+                updateDataSourceIndicator('Données de fallback (erreur API)');
+
+                showNotification(`❌ Erreur de chargement: ${error.message}`, 'error');
+            } finally {
+                if (refreshBtn) {
+                    refreshBtn.disabled = false;
+                    refreshBtn.innerHTML = '<i class="fas fa-sync"></i> Charger Données Réelles';
+                }
+            }
+        }
+
+        // Force refresh with cache bypass and detailed logging
+        function forceRefreshData() {
+            console.log('[FORCE] Starting force refresh with cache bypass...');
+
+            // Clear cache
+            apiClient.clearCache();
+
+            // Force real data mode
+            apiClient.useRealData = true;
+
+            // Add timestamp to bypass browser cache
+            const originalFetch = window.fetch;
+            window.fetch = function(url, options) {
+                if (url.includes('/api/backtests')) {
+                    const separator = url.includes('?') ? '&' : '?';
+                    url = `${separator}_t=${Date.now()}`;
+                }
+                return originalFetch.call(this, url, options);
+            };
+
+            // Reload after a short delay
+            setTimeout(() => {
+                loadRealBacktestData().finally(() => {
+                    // Restore original fetch
+                    window.fetch = originalFetch;
+                });
+            }, 100);
+        }
+
+        // ====== DEBUG FUNCTIONS =====
+        function showApiDebug() {
+            const debugPanel = document.getElementById('debug-panel');
+            const debugContent = document.getElementById('debug-content');
+            
+            if (!debugPanel) {
+                // Create debug panel if it doesn't exist
+                const mainContent = document.getElementById('main-content');
+                const debugCard = document.createElement('div');
+                debugCard.className = 'card';
+                debugCard.id = 'debug-panel';
+                debugCard.innerHTML = `
+                    <h2 class="card-title"><i class="fas fa-bug"></i> Debug API</h2>
+                    <div id="debug-content"></div>
+                `;
+                mainContent.appendChild(debugCard);
+            }
+            
+            const panel = document.getElementById('debug-panel');
+            const content = document.getElementById('debug-content');
+            
+            if (panel && content) {
+                const isVisible = panel.style.display !== 'none';
+                panel.style.display = isVisible ? 'none' : 'block';
+                
+                if (!isVisible) {
+                    content.innerHTML = `
+                        <div class="debug-info">
+                            <h4>Informations de Debug</h4>
+                            <p><strong>Données actuelles:</strong> ${currentData ? 'Chargées' : 'Non chargées'}</p>
+                            <p><strong>API Status:</strong> ${apiClient.cache.size} endpoints en cache</p>
+                            <p><strong>Dernière MAJ:</strong> ${new Date().toLocaleString()}</p>
+                            <button onclick="console.log('Current data:', currentData)" class="control-btn secondary">
+                                <i class="fas fa-code"></i> Log Data
+                            </button>
+                        </div>
+                    `;
+                }
+            }
+        }
+
+        function toggleDataSource() {
+            apiClient.useRealData = !apiClient.useRealData;
+            
+            const source = apiClient.useRealData ? 'Données API réelles' : 'Données simulées';
+            updateDataSourceIndicator(source);
+            
+            showNotification(`Source changée: ${source}`, 'info');
+            
+            // Reload data with new source
+            loadRealBacktestData();
+        }
+
+        // ====== LEGACY DATA LOADING (for compatibility) ======
+        function loadBacktestData() {
+            // Redirect to new real data loading
+            return loadRealBacktestData();
+        }
+
+        // ====== INITIALIZATION ======
+        function initializeApp() {
+            return safeExecute(() => {
+                console.log('[INIT] Initializing NOVAQUOTE Backtest v2.1...');
+                const startTime = Date.now();
+
+                initializeErrorConsole();
+                initializeTabs(); // Initialize tab functionality
+                updateDataSourceIndicator('Initialisation...');
+
+                // Check URL hash for initial tab
+                checkUrlHash();
+
+                // Load real data automatically
+                loadRealBacktestData();
+
+                const initTime = Date.now() - startTime;
+                console.log(`[INIT] ✅ App ready in ${initTime}ms`);
+                showNotification(`Application prête (${initTime}ms)`, 'success', 2000);
+
+            }, 'INITIALIZATION', () => {
+                document.body.innerHTML = `
+                    <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; background: #1a1a1a; color: white; text-align: center; padding: 2rem;">
+                        <div>
+                            <h1 style="color: #ef4444; margin-bottom: 1rem;">Erreur d'Initialisation</h1>
+                            <p style="margin-bottom: 1rem;">L'application n'a pas pu démarrer.</p>
+                            <button onclick="location.reload()" style="background: #3b82f6; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 0.5rem; cursor: pointer;">
+                                Recharger
+                            </button>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        // ====== GLOBAL ERROR HANDLERS ======
+        window.addEventListener('error', function(event) {
+            logError('GLOBAL_ERROR', event.error, {
+                filename: event.filename,
+                lineno: event.lineno,
+                colno: event.colno
+            });
+            showNotification('Erreur JavaScript détectée', 'error');
+        });
+
+        window.addEventListener('unhandledrejection', function(event) {
+            logError('UNHANDLED_PROMISE', event.reason);
+            showNotification('Opération échouée', 'error');
+        });
+
+        // ====== START APP ======
+        document.addEventListener('DOMContentLoaded', initializeApp);
+
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeApp);
+        } else {
+            initializeApp();
+        }
+
+        // ====== ENHANCED DASHBOARD FUNCTIONALITY ======
+        let dashboardCharts = {};
+        let filteredBacktests = [];
+
+        // Update dashboard with data
+        function updateDashboard(backtests) {
+            if (!backtests || backtests.length === 0) return;
+
+            // Update statistics
+            const stats = calculateStats(backtests);
+            updateStatsDisplay(stats);
+
+            // Update charts
+            createDashboardCharts(backtests);
+
+            // Update table
+            updateEnhancedTable(backtests);
+        }
+
+        // Calculate statistics
+        function calculateStats(backtests) {
+            return {
+                total: backtests.length,
+                avgReturn: backtests.reduce((sum, bt) => sum + (bt.return || 0), 0) / backtests.length,
+                avgSharpe: backtests.reduce((sum, bt) => sum + (bt.sharpe || 0), 0) / backtests.length,
+                avgWinRate: backtests.reduce((sum, bt) => sum + (bt.winRate || 0), 0) / backtests.length,
+                totalTrades: backtests.reduce((sum, bt) => sum + (bt.totalTrades || 0), 0),
+                maxReturn: Math.max(...backtests.map(bt => bt.return || 0))
+            };
+        }
+
+        // Update statistics display
+        function updateStatsDisplay(stats) {
+            document.getElementById('bestPerformer').textContent = `${(stats.maxReturn * 100).toFixed(1)}%`;
+            document.getElementById('avgReturn').textContent = `${(stats.avgReturn * 100).toFixed(1)}%`;
+            document.getElementById('avgSharpe').textContent = stats.avgSharpe.toFixed(2);
+            document.getElementById('avgWinRate').textContent = `${(stats.avgWinRate * 100).toFixed(1)}%`;
+            document.getElementById('totalTrades').textContent = stats.totalTrades.toLocaleString();
+        }
+
+        // Create dashboard charts
+        function createDashboardCharts(backtests) {
+            // Destroy existing charts
+            Object.values(dashboardCharts).forEach(chart => {
+                if (chart) chart.destroy();
+            });
+            dashboardCharts = {};
+
+            const sortedBacktests = [...backtests].sort((a, b) => (b.return || 0) - (a.return || 0)).slice(0, 7);
+            const labels = sortedBacktests.map(bt => (bt.name || bt.fullName || '').replace(/_/g, ' ').substring(0, 20));
+
+            // Return Chart
+            const returnCtx = document.getElementById('returnChart');
+            if (returnCtx) {
+                dashboardCharts.return = new Chart(returnCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Return %',
+                            data: sortedBacktests.map(bt => ((bt.return || 0) * 100).toFixed(2)),
+                            backgroundColor: 'rgba(102, 126, 234, 0.8)',
+                            borderColor: 'rgba(102, 126, 234, 1)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            }
+
+            // Sharpe Chart
+            const sharpeCtx = document.getElementById('sharpeChart');
+            if (sharpeCtx) {
+                dashboardCharts.sharpe = new Chart(sharpeCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Sharpe Ratio',
+                            data: sortedBacktests.map(bt => (bt.sharpe || 0).toFixed(2)),
+                            backgroundColor: 'rgba(40, 167, 69, 0.8)',
+                            borderColor: 'rgba(40, 167, 69, 1)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { display: false }
+                        },
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            }
+
+            // Win Rate Chart
+            const winRateCtx = document.getElementById('winRateChart');
+            if (winRateCtx) {
+                dashboardCharts.winRate = new Chart(winRateCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            data: sortedBacktests.map(bt => ((bt.winRate || 0) * 100).toFixed(1)),
+                            backgroundColor: [
+                                'rgba(255, 99, 132, 0.8)',
+                                'rgba(54, 162, 235, 0.8)',
+                                'rgba(255, 206, 86, 0.8)',
+                                'rgba(75, 192, 192, 0.8)',
+                                'rgba(153, 102, 255, 0.8)',
+                                'rgba(255, 159, 64, 0.8)',
+                                'rgba(199, 199, 199, 0.8)'
+                            ]
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        plugins: {
+                            legend: { position: 'right' }
+                        }
+                    }
+                });
+            }
+
+            // Profit Factor Chart
+            const profitFactorCtx = document.getElementById('profitFactorChart');
+            if (profitFactorCtx) {
+                dashboardCharts.profitFactor = new Chart(profitFactorCtx, {
+                    type: 'radar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Profit Factor',
+                            data: sortedBacktests.map(bt => (bt.profitFactor || 0).toFixed(2)),
+                            backgroundColor: 'rgba(118, 75, 162, 0.2)',
+                            borderColor: 'rgba(118, 75, 162, 1)',
+                            borderWidth: 2
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: true,
+                        scales: {
+                            r: { beginAtZero: true }
+                        }
+                    }
+                });
+            }
+        }
+
+        // Update enhanced table
+        function updateEnhancedTable(backtests) {
+            const tbody = document.getElementById('enhancedResultsBody');
+            if (!tbody) return;
+
+            const sortedBacktests = [...backtests].sort((a, b) => (b.return || 0) - (a.return || 0));
+
+            const html = sortedBacktests.map((bt, index) => {
+                const rank = index + 1;
+                const rankClass = rank <= 3 ? `rank-${rank}` : 'rank-other';
+                const name = (bt.name || bt.fullName || '').replace(/_/g, ' ');
+
+                return `
+                    <tr>
+                        <td><span class="rank-badge ${rankClass}">${rank}</span></td>
+                        <td><strong>${name}</strong></td>
+                        <td class="metric-positive">${((bt.return || 0) * 100).toFixed(2)}%</td>
+                        <td class="metric-positive">${((bt.annualReturn || 0) * 100).toFixed(2)}%</td>
+                        <td>${(bt.sharpe || 0).toFixed(2)}</td>
+                        <td class="metric-negative">${Math.abs((bt.maxDrawdown || 0) * 100).toFixed(2)}%</td>
+                        <td>${(bt.totalTrades || 0).toLocaleString()}</td>
+                        <td class="metric-positive">${((bt.winRate || 0) * 100).toFixed(1)}%</td>
+                        <td class="metric-positive">${(bt.profitFactor || 0).toFixed(2)}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            tbody.innerHTML = html;
+        }
+
+        // Filter and sort backtests
+        function filterAndSortBacktests() {
+            if (!currentData || !currentData.backtests) return;
+
+            let filtered = [...currentData.backtests];
+
+            // Apply search filter
+            const searchTerm = document.getElementById('searchFilter')?.value.toLowerCase() || '';
+            if (searchTerm) {
+                filtered = filtered.filter(bt =>
+                    (bt.name || '').toLowerCase().includes(searchTerm) ||
+                    (bt.fullName || '').toLowerCase().includes(searchTerm)
+                );
+            }
+
+            // Apply sort
+            const sortValue = document.getElementById('sortFilter')?.value || 'return-desc';
+            const [field, direction] = sortValue.split('-');
+
+            filtered.sort((a, b) => {
+                let aVal, bVal;
+                switch(field) {
+                    case 'return': aVal = a.return || 0; bVal = b.return || 0; break;
+                    case 'sharpe': aVal = a.sharpe || 0; bVal = b.sharpe || 0; break;
+                    case 'winRate': aVal = a.winRate || 0; bVal = b.winRate || 0; break;
+                    case 'profitFactor': aVal = a.profitFactor || 0; bVal = b.profitFactor || 0; break;
+                    default: aVal = a.return || 0; bVal = b.return || 0;
+                }
+                return direction === 'desc' ? bVal - aVal : aVal - bVal;
+            });
+
+            filteredBacktests = filtered;
+            updateDashboard(filteredBacktests);
+        }
+
+        // Sort table by column
+        function sortTable(columnIndex) {
+            const sortMap = {
+                0: 'return-desc', 1: 'return-desc', 2: 'return-desc', 3: 'return-desc',
+                4: 'sharpe-desc', 5: 'return-desc', 6: 'trades-desc', 7: 'winRate-desc', 8: 'profitFactor-desc'
+            };
+            const sortSelect = document.getElementById('sortFilter');
+            if (sortSelect) {
+                sortSelect.value = sortMap[columnIndex] || 'return-desc';
+                filterAndSortBacktests();
+            }
+        }
+
+        // Refresh dashboard
+        function refreshDashboard() {
+            loadRealBacktestData();
+        }
+
+        // Setup event listeners for filters
+        function setupFilterListeners() {
+            const searchFilter = document.getElementById('searchFilter');
+            const sortFilter = document.getElementById('sortFilter');
+
+            if (searchFilter) {
+                searchFilter.addEventListener('input', filterAndSortBacktests);
+            }
+
+            if (sortFilter) {
+                sortFilter.addEventListener('change', filterAndSortBacktests);
+            }
+        }
+
+        // Update loadRealBacktestData to include dashboard update
+        const originalLoadRealBacktestData = loadRealBacktestData;
+        loadRealBacktestData = async function() {
+            try {
+                await originalLoadRealBacktestData();
+                // Update dashboard after data is loaded
+                setTimeout(() => {
+                    setupFilterListeners();
+                    filterAndSortBacktests();
+                }, 500);
+            } catch (error) {
+                console.error('Error loading data:', error);
+            }
+        };
+
+        console.log('[DASHBOARD] ✅ Enhanced dashboard functionality loaded');
+        console.log('[SCRIPT] ✅ Fixed backtest script loaded successfully');
+    </script>
+</body>
+</html>

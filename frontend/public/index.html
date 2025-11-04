@@ -1,0 +1,1659 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVAQUOTE - Hyperliquid Trading Dashboard</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="assets/novaquote.css" rel="stylesheet">
+    
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="header-content">
+                <h1>📊 NOVAQUOTE</h1>
+                <p class="subtitle">Hyperliquid Trading Dashboard - Paper Trading & Live Trading</p>
+                <div class="nav-links">
+                    <a href="/" class="nav-link"><i class="fas fa-chart-line"></i> Dashboard</a>
+                    <a href="/backtest" class="nav-link"><i class="fas fa-flask"></i> Backtest</a>
+                    <a href="/config" class="nav-link"><i class="fas fa-cogs"></i> Configuration</a>
+                </div>
+
+                <!-- Wallet Selector with MetaMask Integration -->
+                <div class="wallet-selector">
+                    <div class="wallet-dropdown-container">
+                        <button class="wallet-dropdown-button" id="wallet-dropdown-button">
+                            <i class="fas fa-wallet"></i>
+                            <span id="current-wallet-name">Mainnet (Real)</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="wallet-dropdown-menu" id="wallet-dropdown-menu">
+                            <div class="wallet-option" data-wallet="mainnet">
+                                <div class="wallet-option-icon">
+                                    <i class="fas fa-coins"></i>
+                                </div>
+                                <div class="wallet-option-content">
+                                    <div class="wallet-option-title">Mainnet (Real)</div>
+                                    <div class="wallet-option-description">Real trading with actual capital</div>
+                                </div>
+                                <div class="wallet-option-badge badge-mainnet">LIVE</div>
+                            </div>
+                            <div class="wallet-option" data-wallet="testnet">
+                                <div class="wallet-option-icon">
+                                    <i class="fas fa-shield-alt"></i>
+                                </div>
+                                <div class="wallet-option-content">
+                                    <div class="wallet-option-title">Testnet (Paper Trading)</div>
+                                    <div class="wallet-option-description">Hyperliquid testnet - Virtual trading</div>
+                                </div>
+                                <div class="wallet-option-badge badge-testnet">DEMO</div>
+                            </div>
+                            <div class="wallet-option" data-wallet="paper">
+                                <div class="wallet-option-icon">
+                                    <i class="fas fa-database"></i>
+                                </div>
+                                <div class="wallet-option-content">
+                                    <div class="wallet-option-title">Paper Wallet (Fictional)</div>
+                                    <div class="wallet-option-description">Code-based simulated wallet</div>
+                                </div>
+                                <div class="wallet-option-badge badge-paper">SIM</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wallet-balance-display" id="current-wallet-balance">
+                        <i class="fas fa-coins"></i>
+                        <span>$100,000.00</span>
+                    </div>
+
+                    <!-- MetaMask Connection Status -->
+                    <div class="metamask-status" id="metamask-status" style="margin-left: 15px; display: flex; align-items: center; gap: 8px;">
+                        <div class="metamask-indicator" id="metamask-indicator" style="width: 10px; height: 10px; border-radius: 50%; background: #6b7280;"></div>
+                        <span id="metamask-status-text" style="font-size: 0.9em; color: var(--text-secondary);">Wallet</span>
+                        <button class="metamask-connect-btn" id="metamask-connect-btn" style="background: var(--accent-blue); color: white; border: none; padding: 4px 8px; border-radius: 4px; font-size: 0.8em; cursor: pointer; display: none;">
+                            <i class="fab fa-ethereum"></i> Connect
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Status Bar -->
+        <div class="status-bar">
+            <div class="status-item">
+                <div class="status-indicator connected"></div>
+                <span id="connection-status">Connected</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-server"></i>
+                <span id="environment">MAINNET</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-clock"></i>
+                <span id="last-update">--:--:--</span>
+            </div>
+            <div class="status-item">
+                <i class="fas fa-chart-line"></i>
+                <span id="total-pnl">+1.25%</span>
+            </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card profit">
+                <div class="stat-header">
+                    <h3><i class="fas fa-wallet"></i> Total Balance</h3>
+                </div>
+                <div class="stat-value" id="total-value">
+                    $0.00
+                    <span class="currency">USD</span>
+                </div>
+                <div class="stat-change neutral" id="total-change">Loading...</div>
+            </div>
+
+            <div class="stat-card info">
+                <div class="stat-header">
+                    <h3><i class="fas fa-chart-bar"></i> Unrealized P&L</h3>
+                </div>
+                <div class="stat-value" id="unrealized-pnl">
+                    $0.00
+                    <span class="currency">USD</span>
+                </div>
+                <div class="stat-change neutral" id="pnl-change">No positions</div>
+            </div>
+
+            <div class="stat-card info">
+                <div class="stat-header">
+                    <h3><i class="fas fa-bullseye"></i> Active Positions</h3>
+                </div>
+                <div class="stat-value" id="active-positions">
+                    0
+                    <span class="currency">POS</span>
+                </div>
+                <div class="stat-change neutral" id="positions-status">No active trades</div>
+            </div>
+
+            <div class="stat-card info">
+                <div class="stat-header">
+                    <h3><i class="fas fa-trophy"></i> Win Rate</h3>
+                </div>
+                <div class="stat-value" id="win-rate">
+                    0
+                    <span class="currency">%</span>
+                </div>
+                <div class="stat-change neutral" id="win-rate-change">No trades yet</div>
+            </div>
+        </div>
+
+      
+
+
+
+        <!-- HyperLiquid Data Banner -->
+        <div class="hyperliquid-banner">
+            <div class="banner-content">
+                <i class="fas fa-bolt"></i>
+                <span class="banner-text">🚀 Connecté à HyperLiquid API - Données en Temps Réel</span>
+                <span class="banner-status" id="hl-connection-status">● CONNECTÉ</span>
+            </div>
+        </div>
+
+        <!-- SUPER TOKEN MANAGEMENT - Centre de Contrôle Trading Unifié -->
+        <div class="section">
+            <h2><i class="fas fa-coins"></i> 🎯 Token Trading Control Center</h2>
+
+            <!-- Stats principales unifiées -->
+            <div class="token-stats-grid">
+                <div class="token-stat-card">
+                    <div class="token-stat-title">📊 Active Tokens</div>
+                    <div class="token-stat-value" id="active-tokens-count">0</div>
+                    <div class="token-stat-subtitle">in watchlist</div>
+                </div>
+                <div class="token-stat-card">
+                    <div class="token-stat-title">💰 Total Value</div>
+                    <div class="token-stat-value" id="tokens-total-value">$0</div>
+                    <div class="token-stat-subtitle">in positions</div>
+                </div>
+                <div class="token-stat-card">
+                    <div class="token-stat-title">📈 Today's P&L</div>
+                    <div class="token-stat-value" id="tokens-daily-pnl" style="color: var(--accent-green);">+$0</div>
+                    <div class="token-stat-subtitle">all tokens</div>
+                </div>
+                <div class="token-stat-card">
+                    <div class="token-stat-title">⚡ Trading Speed</div>
+                    <div class="token-stat-value" id="trading-speed">READY</div>
+                    <div class="token-stat-subtitle">status</div>
+                </div>
+            </div>
+
+            <!-- Contrôles globaux compact -->
+            <div class="trading-controls-panel">
+                <div class="control-group">
+                    <h3><i class="fas fa-bolt"></i> Quick Trading</h3>
+                    <div class="quick-trade-buttons">
+                        <button class="quick-trade-btn buy-all" id="buy-all-tokens">
+                            <i class="fas fa-shopping-cart"></i>
+                            Buy All Signals
+                        </button>
+                        <button class="quick-trade-btn sell-all" id="sell-all-tokens">
+                            <i class="fas fa-money-bill-wave"></i>
+                            Sell All Positions
+                        </button>
+                        <button class="quick-trade-btn close-all" id="close-all-positions">
+                            <i class="fas fa-times-circle"></i>
+                            Close Everything
+                        </button>
+                        <button class="quick-trade-btn emergency" id="emergency-stop-all">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            EMERGENCY STOP
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Trading Master Control -->
+                <div class="control-group">
+                    <h3><i class="fas fa-rocket"></i> Trading Control</h3>
+                    <div class="master-trading-controls">
+                        <button class="master-trading-btn" id="toggle-trading-master">
+                            <i class="fas fa-play"></i>
+                            <span class="trading-text">Start Trading</span>
+                        </button>
+                        <button class="master-trading-btn secondary" id="refresh-trading-data">
+                            <i class="fas fa-sync-alt"></i>
+                            Refresh Data
+                        </button>
+                    </div>
+                    <div class="trading-status" id="trading-status-indicator">
+                        <span class="status-dot" id="trading-status-dot"></span>
+                        <span class="status-text" id="trading-status-text">Trading Ready</span>
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <h3><i class="fas fa-sliders-h"></i> Global Settings</h3>
+                    <div class="global-settings">
+                        <div class="setting-item">
+                            <label>Global Leverage:</label>
+                            <input type="range" id="global-leverage" min="1" max="50" value="5" class="leverage-slider">
+                            <span id="leverage-value">5x</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>Position Size:</label>
+                            <input type="number" id="global-position-size" value="100" min="10" max="10000" step="10" class="position-input">
+                            <span>USDC</span>
+                        </div>
+                        <div class="setting-item">
+                            <label>Auto Trading:</label>
+                            <button class="toggle-btn" id="global-auto-trading">OFF</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ajout de token avec Market Browser -->
+            <div class="add-token-section">
+                <h3><i class="fas fa-plus-circle"></i> Add Token to Watchlist</h3>
+                <div class="token-adder">
+                    <input type="text" id="token-search" placeholder="Search HyperLiquid token (BTC, ETH, SOL, INJ...)" class="token-search-input">
+                    <select id="token-selector" class="token-selector-dropdown">
+                        <option value="">Choose from HyperLiquid Popular...</option>
+                        <!-- Top Tier - Major Assets -->
+                        <option value="BTC">Bitcoin (BTC) - $109K+</option>
+                        <option value="ETH">Ethereum (ETH) - $3.8K+</option>
+                        <option value="SOL">Solana (SOL) - $186+</option>
+
+                        <!-- DeFi & Layer 1 -->
+                        <option value="BNB">Binance Coin (BNB) - $1K+</option>
+                        <option value="AVAX">Avalanche (AVAX)</option>
+                        <option value="ATOM">Cosmos (ATOM)</option>
+                        <option value="INJ">Injective (INJ)</option>
+
+                        <!-- Layer 2 & Scaling -->
+                        <option value="ARB">Arbitrum (ARB)</option>
+                        <option value="OP">Optimism (OP)</option>
+
+                        <!-- DeFi Blue Chips -->
+                        <option value="LINK">Chainlink (LINK)</option>
+                        <option value="LDO">Lido (LDO)</option>
+                        <option value="CRV">Curve (CRV)</option>
+
+                        <!-- Meme & Gaming -->
+                        <option value="DOGE">Dogecoin (DOGE)</option>
+                        <option value="kPEPE">Kabosu PEPE (kPEPE)</option>
+                        <option value="APE">ApeCoin (APE)</option>
+
+                        <!-- Emerging -->
+                        <option value="SUI">Sui (SUI)</option>
+                        <option value="STX">Stacks (STX)</option>
+                        <option value="LTC">Litecoin (LTC)</option>
+                        <option value="DYDX">dYdX (DYDX)</option>
+                    </select>
+                    <button class="add-token-btn" id="add-token">
+                        <i class="fas fa-plus"></i>
+                        Add Token
+                    </button>
+                    <button class="browse-market-btn" id="browse-market">
+                        <i class="fas fa-search"></i>
+                        Browse Market
+                    </button>
+                </div>
+            </div>
+
+            <!-- Market Browser - Cache les tokens disponibles du marché -->
+            <div class="market-browser-section" id="market-browser" style="display: none;">
+                <h3><i class="fas fa-store"></i> Market Browser - Available Tokens</h3>
+                <div class="market-tokens-grid" id="market-tokens-browser">
+                    <div class="loading-market">
+                        <div class="spinner"></div>
+                        <p>Loading market data...</p>
+                    </div>
+                </div>
+                <div class="market-browser-controls">
+                    <button class="close-browser-btn" id="close-market-browser">
+                        <i class="fas fa-times"></i>
+                        Close Browser
+                    </button>
+                    <button class="refresh-market-btn" id="refresh-market">
+                        <i class="fas fa-sync"></i>
+                        Refresh Market
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tokens actifs - Section principale -->
+            <div class="monitored-tokens-main">
+                <h3><i class="fas fa-chart-line"></i> Active Trading Tokens</h3>
+                <div class="tokens-grid" id="monitored-tokens">
+                    <div class="loading-tokens">
+                        <div class="spinner"></div>
+                        <p>Loading real-time token data...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Positions Table Section -->
+        <div class="section">
+            <h2><i class="fas fa-list"></i> Active Positions</h2>
+            <div class="positions-table">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Symbol</th>
+                                <th>Side</th>
+                                <th>Size</th>
+                                <th>Entry Price</th>
+                                <th>Mark Price</th>
+                                <th>P&L</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="positions-tbody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; opacity: 0.7;">No active positions</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Trades Section -->
+        <div class="section">
+            <h2><i class="fas fa-history"></i> Recent Trades</h2>
+            <div class="trades-container">
+                <div class="table-container">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Time</th>
+                                <th>Symbol</th>
+                                <th>Side</th>
+                                <th>Size</th>
+                                <th>Price</th>
+                                <th>P&L</th>
+                            </tr>
+                        </thead>
+                        <tbody id="trades-tbody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; opacity: 0.7;">No recent trades</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- System Status -->
+    <div class="system-status">
+        <i class="fas fa-info-circle"></i>
+        <span>System Status: <strong id="system-status">Operational</strong></span>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Wallet dropdown functionality
+        document.getElementById('wallet-dropdown-button').addEventListener('click', function() {
+            const menu = document.getElementById('wallet-dropdown-menu');
+            menu.classList.toggle('active');
+            this.classList.toggle('active');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const button = document.getElementById('wallet-dropdown-button');
+            const menu = document.getElementById('wallet-dropdown-menu');
+            if (!button.contains(event.target) && !menu.contains(event.target)) {
+                menu.classList.remove('active');
+                button.classList.remove('active');
+            }
+        });
+
+        // Wallet selection
+        document.querySelectorAll('.wallet-option').forEach(option => {
+            option.addEventListener('click', async function() {
+                const walletType = this.dataset.wallet;
+                const walletName = this.querySelector('.wallet-option-title').textContent;
+
+                // Update button text
+                document.getElementById('current-wallet-name').textContent = walletName;
+
+                // Remove active class from all options
+                document.querySelectorAll('.wallet-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                });
+
+                // Add active class to selected option
+                this.classList.add('selected');
+
+                // Close dropdown
+                document.getElementById('wallet-dropdown-menu').classList.remove('active');
+                document.getElementById('wallet-dropdown-button').classList.remove('active');
+
+                // Update environment indicator
+                document.getElementById('environment').textContent = walletType.toUpperCase();
+
+                // Update wallet balance based on type
+                await updateWalletBalance(walletType);
+
+                showNotification(`Switched to ${walletName}`, 'success');
+            });
+        });
+
+        // Function to update wallet balance based on wallet type
+        async function updateWalletBalance(walletType) {
+            const balanceElement = document.getElementById('current-wallet-balance').querySelector('span');
+
+            try {
+                let balanceText = '';
+
+                if (walletType === 'paper') {
+                    // Paper wallet - show fictional/demo balance (no API call needed)
+                    balanceText = '$1,000,000.00';
+                } else {
+                    // Mainnet & Testnet - fetch real balance from HyperLiquid API
+                    const response = await fetch(`/api/wallet/balance/${walletType}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.success) {
+                            balanceText = new Intl.NumberFormat('en-US', {
+                                style: 'currency',
+                                currency: 'USD',
+                                minimumFractionDigits: 2
+                            }).format(data.balance);
+                        } else {
+                            // API returned success=false
+                            balanceText = '$0.00';
+                            showNotification(`Erreur récupération balance ${walletType}`, 'error');
+                        }
+                    } else {
+                        // API call failed
+                        balanceText = walletType === 'mainnet' ? '$0.00' : '$100,000.00';
+                        showNotification(`Connexion ${walletType} indisponible`, 'warning');
+                    }
+                }
+
+                balanceElement.textContent = balanceText;
+                // Also update main portfolio value display
+                document.getElementById('total-value').textContent = balanceText;
+
+            } catch (error) {
+                console.error(`Error fetching ${walletType} balance:`, error);
+                // Fallback values
+                const fallbackBalance = walletType === 'mainnet' ? '$0.00' :
+                                      walletType === 'testnet' ? '$100,000.00' : '$1,000,000.00';
+
+                balanceElement.textContent = fallbackBalance;
+                document.getElementById('total-value').textContent = fallbackBalance;
+                showNotification(`Erreur réseau - Balance ${walletType} non disponible`, 'error');
+            }
+
+            // Update status bar connection status based on wallet type
+            const connectionStatus = document.getElementById('connection-status');
+            if (walletType === 'mainnet') {
+                connectionStatus.textContent = 'Live Trading';
+            } else if (walletType === 'testnet') {
+                connectionStatus.textContent = 'Testnet';
+            } else if (walletType === 'paper') {
+                connectionStatus.textContent = 'Paper Trading';
+            }
+        }
+
+      
+        // ===========================================
+        // SUPER TOKEN MANAGEMENT FUNCTIONALITY
+        // ===========================================
+
+        // Global state for tokens
+        let activeTokens = new Map(); // symbol -> token data
+        let tokenPositions = new Map(); // symbol -> position data
+        let globalSettings = {
+            leverage: 5,
+            positionSize: 100,
+            autoTrading: false
+        };
+        let currentAgentPid = null; // Track running trading agent PID
+
+        // Initialize token management
+        function initializeTokenManagement() {
+            console.log('🎯 Initializing Super Token Management...');
+            loadActiveTokens();
+            setupEventListeners();
+            startRealTimeTokenUpdates();
+        }
+
+        // Setup event listeners with safety checks
+        function setupEventListeners() {
+            // Add token functionality
+            const addTokenBtn = document.getElementById('add-token');
+            if (addTokenBtn) addTokenBtn.addEventListener('click', addTokenToWatchlist);
+
+            // Token search
+            const tokenSearch = document.getElementById('token-search');
+            if (tokenSearch) {
+                tokenSearch.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        addTokenToWatchlist();
+                    }
+                });
+            }
+
+            // Quick trading buttons
+            const buyAllBtn = document.getElementById('buy-all-tokens');
+            const sellAllBtn = document.getElementById('sell-all-tokens');
+            const closeAllBtn = document.getElementById('close-all-positions');
+            const emergencyStopBtn = document.getElementById('emergency-stop-all');
+
+            if (buyAllBtn) buyAllBtn.addEventListener('click', buyAllTokens);
+            if (sellAllBtn) sellAllBtn.addEventListener('click', sellAllTokens);
+            if (closeAllBtn) closeAllBtn.addEventListener('click', closeAllPositions);
+            if (emergencyStopBtn) emergencyStopBtn.addEventListener('click', emergencyStopAll);
+
+            // Global settings with safety checks
+            const leverageSlider = document.getElementById('global-leverage');
+            if (leverageSlider) {
+                leverageSlider.addEventListener('input', function() {
+                    globalSettings.leverage = parseInt(this.value);
+                    const leverageValueEl = document.getElementById('leverage-value');
+                    if (leverageValueEl) leverageValueEl.textContent = `${globalSettings.leverage}x`;
+                });
+            }
+
+            const positionSizeInput = document.getElementById('global-position-size');
+            if (positionSizeInput) {
+                positionSizeInput.addEventListener('change', function() {
+                    globalSettings.positionSize = parseInt(this.value);
+                });
+            }
+
+            const autoTradingBtn = document.getElementById('global-auto-trading');
+            if (autoTradingBtn) {
+                autoTradingBtn.addEventListener('click', function() {
+                    globalSettings.autoTrading = !globalSettings.autoTrading;
+                    this.classList.toggle('active', globalSettings.autoTrading);
+                    this.textContent = globalSettings.autoTrading ? 'ON' : 'OFF';
+                    showNotification(`Auto Trading ${globalSettings.autoTrading ? 'enabled' : 'disabled'}`,
+                                 globalSettings.autoTrading ? 'success' : 'info');
+                });
+            }
+
+            // Market Browser functionality with safety checks
+            const browseMarketBtn = document.getElementById('browse-market');
+            const closeMarketBtn = document.getElementById('close-market-browser');
+            const refreshMarketBtn = document.getElementById('refresh-market');
+
+            if (browseMarketBtn) browseMarketBtn.addEventListener('click', toggleMarketBrowser);
+            if (closeMarketBtn) closeMarketBtn.addEventListener('click', closeMarketBrowser);
+            if (refreshMarketBtn) refreshMarketBtn.addEventListener('click', refreshMarketData);
+
+            // Master Trading Controls
+            const toggleTradingBtn = document.getElementById('toggle-trading-master');
+            const refreshTradingBtn = document.getElementById('refresh-trading-data');
+
+            if (toggleTradingBtn) {
+                toggleTradingBtn.addEventListener('click', async function() {
+                    const isActive = this.classList.contains('active');
+                    const statusDot = document.getElementById('trading-status-dot');
+                    const statusText = document.getElementById('trading-status-text');
+                    const tradingText = this.querySelector('.trading-text');
+                    const icon = this.querySelector('i');
+
+                    if (isActive) {
+                        // Stop trading via backend API
+                        try {
+                            const response = await fetch('/api/agents/stop', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ pid: currentAgentPid })
+                            });
+
+                            const result = await response.json();
+                            if (result.success) {
+                                this.classList.remove('active');
+                                tradingText.textContent = 'Start Trading';
+                                icon.className = 'fas fa-play';
+
+                                if (statusDot) {
+                                    statusDot.classList.remove('active');
+                                    statusDot.classList.add('stopped');
+                                }
+                                if (statusText) {
+                                    statusText.textContent = 'Trading Stopped';
+                                    statusText.classList.remove('active');
+                                    statusText.classList.add('stopped');
+                                }
+
+                                showNotification('✅ Trading stopped', 'info');
+                                currentAgentPid = null;
+                            }
+                        } catch (error) {
+                            showNotification(`❌ Failed to stop trading: ${error.message}`, 'error');
+                        }
+                    } else {
+                        // Start trading via backend API
+                        try {
+                            const response = await fetch('/api/agents/start', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({
+                                    agentType: 'hyperliquid',
+                                    config: {
+                                        leverage: parseInt(document.getElementById('global-leverage').value),
+                                        positionSize: parseInt(document.getElementById('global-position-size').value)
+                                    }
+                                })
+                            });
+
+                            const result = await response.json();
+                            if (result.success) {
+                                this.classList.add('active');
+                                tradingText.textContent = 'Stop Trading';
+                                icon.className = 'fas fa-stop';
+
+                                if (statusDot) {
+                                    statusDot.classList.remove('stopped');
+                                    statusDot.classList.add('active');
+                                }
+                                if (statusText) {
+                                    statusText.textContent = 'Trading Active';
+                                    statusText.classList.remove('stopped');
+                                    statusText.classList.add('active');
+                                }
+
+                                showNotification('🚀 HyperLiquid Trading Agent started!', 'success');
+                                currentAgentPid = result.pid;
+                            } else {
+                                throw new Error(result.error || 'Failed to start agent');
+                            }
+                        } catch (error) {
+                            console.error('Start trading error:', error);
+                            showNotification(`❌ Failed to start trading: ${error.message}`, 'error');
+                        }
+                    }
+                });
+            }
+
+            if (refreshTradingBtn) {
+                refreshTradingBtn.addEventListener('click', function() {
+                    const icon = this.querySelector('i');
+                    icon.classList.add('fa-spin');
+
+                    // Refresh all data
+                    loadMarketData();
+                    loadDashboardData();
+                    refreshMarketData();
+
+                    setTimeout(() => {
+                        icon.classList.remove('fa-spin');
+                        showNotification('All data refreshed', 'success');
+                    }, 1000);
+                });
+            }
+        }
+
+        // Add token to watchlist
+        async function addTokenToWatchlist() {
+            const searchInput = document.getElementById('token-search');
+            const selector = document.getElementById('token-selector');
+
+            let tokenSymbol = searchInput.value.trim().toUpperCase() || selector.value;
+
+            if (!tokenSymbol) {
+                showNotification('Please enter a token symbol or select from dropdown', 'warning');
+                return;
+            }
+
+            // Add token to active list
+            if (!activeTokens.has(tokenSymbol)) {
+                const tokenData = await fetchTokenData(tokenSymbol);
+                if (tokenData) {
+                    activeTokens.set(tokenSymbol, {
+                        ...tokenData,
+                        addedAt: new Date().toISOString(),
+                        position: null,
+                        alerts: []
+                    });
+
+                    searchInput.value = '';
+                    selector.value = '';
+
+                    updateTokensDisplay();
+                    updateTokenStats();
+                    showNotification(`${tokenSymbol} added to watchlist`, 'success');
+                } else {
+                    showNotification(`Could not fetch data for ${tokenSymbol}`, 'error');
+                }
+            } else {
+                showNotification(`${tokenSymbol} is already in watchlist`, 'warning');
+            }
+        }
+
+        // Fetch token data from API
+        async function fetchTokenData(symbol) {
+            try {
+                // Try to get from our current tokens API first
+                const response = await fetch('/api/tokens');
+                const data = await response.json();
+
+                if (data.success && data.tokens) {
+                    const token = data.tokens.find(t => t.symbol === symbol);
+                    if (token) {
+                        return token;
+                    }
+                }
+
+                // Fallback to direct HyperLiquid API
+                const pricesResponse = await fetch('https://api.hyperliquid.xyz/info', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ type: 'allMids' })
+                });
+
+                if (pricesResponse.ok) {
+                    const prices = await pricesResponse.json();
+                    if (prices[symbol]) {
+                        return {
+                            symbol: symbol,
+                            price: parseFloat(prices[symbol]),
+                            change: 0,
+                            market: 'HyperLiquid',
+                            exchange: 'HYPERLIQUID',
+                            maxLeverage: 10
+                        };
+                    }
+                }
+            } catch (error) {
+                console.error(`Error fetching token data for ${symbol}:`, error);
+            }
+
+            return null;
+        }
+
+        // Update tokens display
+        function updateTokensDisplay() {
+            const container = document.getElementById('monitored-tokens');
+
+            if (activeTokens.size === 0) {
+                container.innerHTML = `
+                    <div class="loading-tokens">
+                        <div class="spinner"></div>
+                        <p>No tokens in watchlist. Add tokens above to start trading!</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const tokensHtml = Array.from(activeTokens.entries()).map(([symbol, tokenData]) => {
+                const position = tokenPositions.get(symbol);
+                const hasPosition = position && position.size !== 0;
+
+                return `
+                    <div class="token-card-enhanced fade-in-up">
+                        <div class="token-header-enhanced">
+                            <div class="token-symbol-enhanced">
+                                ${symbol}
+                                <span class="hyperliquid-badge">HL</span>
+                                <span class="position-badge ${hasPosition ? (position.size > 0 ? 'long' : 'short') : 'none'}">
+                                    ${hasPosition ? (position.size > 0 ? 'LONG' : 'SHORT') : 'NO POS'}
+                                </span>
+                            </div>
+                            <div class="token-price-enhanced">
+                                ${tokenData.price >= 1000
+                                    ? `$${tokenData.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+                                    : tokenData.price >= 1
+                                        ? `$${tokenData.price.toFixed(2)}`
+                                        : `$${tokenData.price.toFixed(4)}`
+                                }
+                                <span class="price-update-indicator" title="Prix HyperLiquid en temps réel">⚡</span>
+                            </div>
+                        </div>
+
+                        <div class="token-change-enhanced ${tokenData.change >= 0 ? 'positive' : 'negative'}">
+                            ${tokenData.change >= 0 ? '+' : ''}${tokenData.change.toFixed(2)}%
+                        </div>
+
+                        <div class="token-metrics-enhanced">
+                            <div class="metric-enhanced">
+                                <span class="metric-label-enhanced">Leverage:</span>
+                                <span class="metric-value-enhanced">${tokenData.maxLeverage}x</span>
+                            </div>
+                            <div class="metric-enhanced">
+                                <span class="metric-label-enhanced">Position:</span>
+                                <span class="metric-value-enhanced">
+                                    ${hasPosition ? `${Math.abs(position.size).toFixed(4)}` : '0'}
+                                </span>
+                            </div>
+                            <div class="metric-enhanced">
+                                <span class="metric-label-enhanced">P&L:</span>
+                                <span class="metric-value-enhanced" style="color: ${hasPosition && position.pnl > 0 ? 'var(--accent-green)' : 'var(--accent-red)'}">
+                                    ${hasPosition ? `$${position.pnl.toFixed(2)}` : '$0'}
+                                </span>
+                            </div>
+                            <div class="metric-enhanced">
+                                <span class="metric-label-enhanced">Market:</span>
+                                <span class="metric-value-enhanced">${tokenData.market}</span>
+                            </div>
+                        </div>
+
+                        <div class="token-actions-enhanced">
+                            <button class="token-action-btn buy" onclick="executeTokenTrade('${symbol}', 'buy')">
+                                <i class="fas fa-shopping-cart"></i> Buy
+                            </button>
+                            <button class="token-action-btn sell" onclick="executeTokenTrade('${symbol}', 'sell')">
+                                <i class="fas fa-money-bill-wave"></i> Sell
+                            </button>
+                            <button class="token-action-btn close" onclick="executeTokenTrade('${symbol}', 'close')">
+                                <i class="fas fa-times"></i> Close
+                            </button>
+                            <button class="token-action-btn remove" onclick="removeToken('${symbol}')">
+                                <i class="fas fa-trash"></i> Remove
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = tokensHtml;
+        }
+
+        // Execute token trade via backend API
+        async function executeTokenTrade(symbol, action) {
+            const tokenData = activeTokens.get(symbol);
+            if (!tokenData) return;
+
+            console.log(`🎯 Executing ${action} trade for ${symbol}`);
+
+            try {
+                if (action === 'buy' || action === 'sell') {
+                    // Place order via backend
+                    const response = await fetch('/api/hyperliquid/trade', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            symbol: symbol,
+                            side: action,
+                            size: globalSettings.positionSize / tokenData.price,
+                            price: tokenData.price
+                        })
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        showNotification(`✅ ${action.toUpperCase()} order placed for ${symbol}`, 'success');
+                        updateTokenPosition(symbol, action === 'buy' ? 1 : -1, tokenData.price);
+                    } else {
+                        throw new Error(result.error || 'Trade failed');
+                    }
+                } else if (action === 'close') {
+                    // Close position via backend
+                    const response = await fetch('/api/hyperliquid/close', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ symbol: symbol })
+                    });
+
+                    const result = await response.json();
+                    if (result.success) {
+                        const position = tokenPositions.get(symbol);
+                        if (position && position.size !== 0) {
+                            showNotification(`✅ CLOSED position for ${symbol}`, 'warning');
+                            tokenPositions.delete(symbol);
+                        } else {
+                            showNotification(`No position to close for ${symbol}`, 'warning');
+                        }
+                    } else {
+                        throw new Error(result.error || 'Close failed');
+                    }
+                }
+
+                updateTokensDisplay();
+                updateTokenStats();
+            } catch (error) {
+                console.error('Trade error:', error);
+                showNotification(`❌ Trade failed: ${error.message}`, 'error');
+            }
+        }
+
+        // Update token position
+        function updateTokenPosition(symbol, direction, price) {
+            const position = tokenPositions.get(symbol) || { size: 0, entryPrice: price, pnl: 0 };
+
+            // Simplified position tracking
+            const tradeSize = globalSettings.positionSize / price;
+            position.size += direction * tradeSize;
+            position.entryPrice = price;
+            position.pnl = 0; // Would calculate real P&L
+
+            tokenPositions.set(symbol, position);
+        }
+
+        // Remove token
+        function removeToken(symbol) {
+            activeTokens.delete(symbol);
+            tokenPositions.delete(symbol);
+            updateTokensDisplay();
+            updateTokenStats();
+            showNotification(`${symbol} removed from watchlist`, 'info');
+        }
+
+        // Quick trading functions
+        function buyAllTokens() {
+            if (activeTokens.size === 0) {
+                showNotification('No tokens in watchlist to buy', 'warning');
+                return;
+            }
+
+            showNotification(`Placing BUY orders for ${activeTokens.size} tokens`, 'success');
+            activeTokens.forEach((tokenData, symbol) => {
+                executeTokenTrade(symbol, 'buy');
+            });
+        }
+
+        function sellAllTokens() {
+            if (activeTokens.size === 0) {
+                showNotification('No tokens in watchlist to sell', 'warning');
+                return;
+            }
+
+            showNotification(`Placing SELL orders for ${activeTokens.size} tokens`, 'info');
+            activeTokens.forEach((tokenData, symbol) => {
+                executeTokenTrade(symbol, 'sell');
+            });
+        }
+
+        function closeAllPositions() {
+            const positionsToClose = Array.from(tokenPositions.keys()).filter(symbol => {
+                const pos = tokenPositions.get(symbol);
+                return pos && pos.size !== 0;
+            });
+
+            if (positionsToClose.length === 0) {
+                showNotification('No positions to close', 'warning');
+                return;
+            }
+
+            showNotification(`Closing ${positionsToClose.length} positions`, 'warning');
+            positionsToClose.forEach(symbol => {
+                executeTokenTrade(symbol, 'close');
+            });
+        }
+
+        function emergencyStopAll() {
+            showNotification('🚨 EMERGENCY STOP - Closing all positions and stopping trading', 'error');
+            closeAllPositions();
+            globalSettings.autoTrading = false;
+            document.getElementById('global-auto-trading').classList.remove('active');
+            document.getElementById('global-auto-trading').textContent = 'OFF';
+            document.getElementById('trading-speed').textContent = 'STOPPED';
+            document.getElementById('trading-speed').style.color = 'var(--accent-red)';
+        }
+
+        // Update token stats
+        function updateTokenStats() {
+            document.getElementById('active-tokens-count').textContent = activeTokens.size;
+
+            let totalValue = 0;
+            let totalPnl = 0;
+
+            tokenPositions.forEach((position) => {
+                if (position.size !== 0) {
+                    totalValue += Math.abs(position.size * position.entryPrice);
+                    totalPnl += position.pnl;
+                }
+            });
+
+            document.getElementById('tokens-total-value').textContent = `$${totalValue.toLocaleString()}`;
+            document.getElementById('tokens-daily-pnl').textContent = `${totalPnl >= 0 ? '+' : ''}$${totalPnl.toFixed(2)}`;
+            document.getElementById('tokens-daily-pnl').style.color = totalPnl >= 0 ? 'var(--accent-green)' : 'var(--accent-red)';
+
+            if (globalSettings.autoTrading) {
+                document.getElementById('trading-speed').textContent = 'AUTO';
+                document.getElementById('trading-speed').style.color = 'var(--accent-green)';
+            } else {
+                document.getElementById('trading-speed').textContent = 'READY';
+                document.getElementById('trading-speed').style.color = 'var(--text-primary)';
+            }
+        }
+
+        // Load active tokens from storage
+        function loadActiveTokens() {
+            // For now, start with popular tokens
+            const popularTokens = ['BTC', 'ETH', 'SOL'];
+            popularTokens.forEach(symbol => {
+                fetchTokenData(symbol).then(tokenData => {
+                    if (tokenData) {
+                        activeTokens.set(symbol, {
+                            ...tokenData,
+                            addedAt: new Date().toISOString(),
+                            position: null,
+                            alerts: []
+                        });
+                    }
+                });
+            });
+        }
+
+        // Start real-time token updates
+        function startRealTimeTokenUpdates() {
+            setInterval(async () => {
+                if (activeTokens.size > 0) {
+                    // Update prices for active tokens
+                    for (const [symbol, tokenData] of activeTokens.entries()) {
+                        const freshData = await fetchTokenData(symbol);
+                        if (freshData) {
+                            activeTokens.set(symbol, { ...tokenData, ...freshData });
+                        }
+                    }
+                    updateTokensDisplay();
+                }
+            }, 10000); // Update every 10 seconds
+        }
+
+        // Initialize when DOM is loaded
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', initializeTokenManagement);
+        } else {
+            initializeTokenManagement();
+        }
+
+        // Market data loading with rate limiting
+        async function loadMarketData() {
+            // Rate limiting check
+            const now = Date.now();
+            if (isLoadingMarketData || (now - lastMarketDataLoad) < MARKET_DATA_THROTTLE) {
+                return;
+            }
+
+            isLoadingMarketData = true;
+            lastMarketDataLoad = now;
+
+            try {
+                const response = await fetch('/api/tokens');
+                const data = await response.json();
+
+                if (data.success && data.tokens && data.tokens.length > 0) {
+                    updateMarketTokens(data.tokens);
+                } else {
+                    showNoDataMessage('market-tokens-browser', 'Aucune donnée de marché disponible');
+                }
+            } catch (error) {
+                console.error('Error loading market data:', error);
+                showNoDataMessage('market-tokens-browser', 'Erreur de connexion - Données indisponibles');
+            } finally {
+                isLoadingMarketData = false;
+            }
+        }
+
+        function updateMarketTokens(tokens) {
+            const container = document.getElementById('market-tokens-browser');
+            container.innerHTML = '';
+
+            // Vérifier si on a des données réelles de HyperLiquid
+            if (!tokens || tokens.length === 0) {
+                showNoDataMessage('market-tokens-browser', 'Chargement des données HyperLiquid...');
+                return;
+            }
+
+            // Afficher l'en-tête avec informations sur la source
+            const header = document.createElement('div');
+            header.className = 'market-header';
+            header.innerHTML = `
+                <div class="market-info">
+                    <span class="data-source">📡 Données HyperLiquid en Temps Réel</span>
+                    <span class="token-count">${tokens.length} tokens disponibles</span>
+                    <span class="last-update">Mis à jour: ${new Date().toLocaleTimeString()}</span>
+                </div>
+            `;
+            container.appendChild(header);
+
+            tokens.forEach(token => {
+                const changeClass = token.change >= 0 ? 'positive' : 'negative';
+                const changeSymbol = token.change >= 0 ? '+' : '';
+
+                // Formater le prix selon la valeur
+                let formattedPrice;
+                if (token.price >= 1000) {
+                    formattedPrice = `$${token.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+                } else if (token.price >= 1) {
+                    formattedPrice = `$${token.price.toFixed(2)}`;
+                } else if (token.price >= 0.01) {
+                    formattedPrice = `$${token.price.toFixed(4)}`;
+                } else {
+                    formattedPrice = `$${token.price.toFixed(8)}`;
+                }
+
+                // Badge pour identifier la source HyperLiquid
+                const sourceTooltip = `Prix en temps réel de ${token.symbol} via HyperLiquid API`;
+                const sourceClass = 'hyperliquid_realtime';
+
+                const tokenCard = document.createElement('div');
+                tokenCard.className = 'token-card-compact fade-in-up';
+                tokenCard.innerHTML = `
+                    <div class="token-header">
+                        <div class="token-name">${token.symbol}</div>
+                        <div class="token-price">
+                            ${formattedPrice}
+                            <div class="price-source ${sourceClass}" data-tooltip="${sourceTooltip}">
+                                HL
+                            </div>
+                        </div>
+                    </div>
+                    ${token.change !== undefined && token.change !== 0 ?
+                        `<div class="token-change ${changeClass}">${changeSymbol}${token.change.toFixed(1)}%</div>` :
+                        `<div class="token-change neutral">--</div>`
+                    }
+                `;
+
+                container.appendChild(tokenCard);
+            });
+        }
+
+        function showNoDataMessage(containerId, message) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = `
+                <div class="no-data-message" style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                    <i class="fas fa-chart-line" style="font-size: 48px; opacity: 0.3; margin-bottom: 20px;"></i>
+                    <p style="font-size: 1.1em; margin-bottom: 10px;">${message}</p>
+                    <p style="font-size: 0.9em; opacity: 0.7;">Les données seront affichées une fois le backend connecté</p>
+                </div>
+            `;
+        }
+
+        // Dashboard data loading
+        async function loadDashboardData() {
+            try {
+                const [statsResponse, balancesResponse] = await Promise.all([
+                    fetch('/api/stats'),
+                    fetch('/api/balances')
+                ]);
+
+                const statsData = await statsResponse.json();
+                const balancesData = await balancesResponse.json();
+
+                if (statsData.success) {
+                    updateDashboardStats(statsData);
+                } else {
+                    showDashboardNoData();
+                }
+
+                if (balancesData.success) {
+                    updateBalances(balancesData);
+                } else {
+                    updateBalancesFallback();
+                }
+
+                updateLastUpdateTime();
+
+            } catch (error) {
+                console.error('Error loading dashboard data:', error);
+                showDashboardNoData();
+                updateBalancesFallback();
+            }
+        }
+
+        function updateDashboardStats(data) {
+            // Update main stat cards with safety checks
+            const totalValueEl = document.getElementById('total-value');
+            const activePositionsEl = document.getElementById('active-positions');
+            const unrealizedPnlEl = document.getElementById('unrealized-pnl');
+            const winRateEl = document.getElementById('win-rate');
+
+            // Safety checks for undefined values before calling toLocaleString()
+            if (totalValueEl) {
+                const totalBalance = data.total_balance !== undefined ? data.total_balance : 0;
+                totalValueEl.textContent = `$${totalBalance.toLocaleString()}`;
+            }
+            if (activePositionsEl) activePositionsEl.textContent = data.active_positions || 0;
+            if (unrealizedPnlEl) {
+                const pnlToday = data.pnl_today !== undefined ? data.pnl_today : 0;
+                unrealizedPnlEl.textContent = `$${pnlToday.toLocaleString()}`;
+            }
+            if (winRateEl) winRateEl.textContent = `${data.win_rate || 0}%`;
+
+            // Try to update summary cards if they exist
+            const summaryBalanceEl = document.getElementById('summary-balance');
+            const summaryMarginEl = document.getElementById('summary-margin');
+            const summaryPnlEl = document.getElementById('summary-pnl');
+
+            if (summaryBalanceEl) {
+                const totalBalance = data.total_balance !== undefined ? data.total_balance : 0;
+                summaryBalanceEl.textContent = `$${totalBalance.toLocaleString()}`;
+            }
+            if (summaryMarginEl) {
+                const totalBalance = data.total_balance !== undefined ? data.total_balance : 0;
+                const pnlToday = data.pnl_today !== undefined ? data.pnl_today : 0;
+                summaryMarginEl.textContent = `$${(totalBalance - pnlToday).toLocaleString()}`;
+            }
+            if (summaryPnlEl) {
+                const pnlToday = data.pnl_today !== undefined ? data.pnl_today : 0;
+                summaryPnlEl.textContent = `$${pnlToday.toLocaleString()}`;
+            }
+        }
+
+        function updateBalances(data) {
+            const totalValueEl = document.getElementById('total-value');
+            const unrealizedPnlEl = document.getElementById('unrealized-pnl');
+
+            // Safety checks for undefined values before calling toLocaleString()
+            if (totalValueEl) {
+                const balance = data.balance !== undefined ? data.balance : 0;
+                totalValueEl.textContent = `$${balance.toLocaleString()}`;
+            }
+            if (unrealizedPnlEl) {
+                const pnl = data.pnl !== undefined ? data.pnl : 0;
+                unrealizedPnlEl.textContent = `$${pnl.toLocaleString()}`;
+            }
+        }
+
+        function updateBalancesFallback() {
+            // Show default balance from wallet selection instead of hardcoded demo data
+            const walletType = document.querySelector('.wallet-option.selected')?.dataset.wallet || 'mainnet';
+            let fallbackBalance = '$0.00';
+
+            switch(walletType) {
+                case 'mainnet': fallbackBalance = '$0.00'; break;
+                case 'testnet': fallbackBalance = '$100,000.00'; break;
+                case 'paper': fallbackBalance = '$1,000,000.00'; break;
+            }
+
+            document.getElementById('total-value').textContent = fallbackBalance;
+            document.getElementById('unrealized-pnl').textContent = 'N/A';
+        }
+
+        function showDashboardNoData() {
+            // Update stats cards to show no data state with safety checks
+            const activePositionsEl = document.getElementById('active-positions');
+            const winRateEl = document.getElementById('win-rate');
+            const totalValueEl = document.getElementById('total-value');
+            const unrealizedPnlEl = document.getElementById('unrealized-pnl');
+
+            if (activePositionsEl) activePositionsEl.textContent = 'N/A';
+            if (winRateEl) winRateEl.textContent = 'N/A';
+            if (totalValueEl) totalValueEl.textContent = 'N/A';
+            if (unrealizedPnlEl) unrealizedPnlEl.textContent = 'N/A';
+
+            // Try to update summary cards if they exist
+            const summaryBalanceEl = document.getElementById('summary-balance');
+            const summaryMarginEl = document.getElementById('summary-margin');
+            const summaryPnlEl = document.getElementById('summary-pnl');
+
+            if (summaryBalanceEl) summaryBalanceEl.textContent = 'N/A';
+            if (summaryMarginEl) summaryMarginEl.textContent = 'N/A';
+            if (summaryPnlEl) summaryPnlEl.textContent = 'N/A';
+
+            // Show notification about backend connection
+            showNotification('Backend non connecté - Mode démonstration activé', 'warning');
+        }
+
+        function updateLastUpdateTime() {
+            const now = new Date();
+            document.getElementById('last-update').textContent = 
+                now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        }
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.textContent = message;
+            
+            document.body.appendChild(notification);
+            
+            setTimeout(() => {
+                notification.remove();
+            }, 3000);
+        }
+
+        // Rate limiting variables
+        let isLoadingMarketData = false;
+        let lastMarketDataLoad = 0;
+        const MARKET_DATA_THROTTLE = 10000; // 10 seconds minimum between calls
+
+        // Real-time updates with rate limiting
+        function startRealTimeUpdates() {
+            // Market data update with throttling
+            setInterval(() => {
+                const now = Date.now();
+                if (!isLoadingMarketData && (now - lastMarketDataLoad) >= MARKET_DATA_THROTTLE) {
+                    loadMarketData();
+                }
+            }, 10000); // Check every 10 seconds
+
+            // Time update every second
+            setInterval(() => {
+                updateLastUpdateTime();
+            }, 1000);
+        }
+
+        // Initialize dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            loadMarketData();
+            loadDashboardData();
+            startRealTimeUpdates();
+
+            console.log('🚀 NOVAQUOTE Dashboard initialized');
+        });
+
+        // Market Browser functionality
+        function toggleMarketBrowser() {
+            const browser = document.getElementById('market-browser');
+            if (browser.style.display === 'none') {
+                browser.style.display = 'block';
+                refreshMarketData();
+            } else {
+                browser.style.display = 'none';
+            }
+        }
+
+        function closeMarketBrowser() {
+            const browser = document.getElementById('market-browser');
+            browser.style.display = 'none';
+        }
+
+        async function refreshMarketData() {
+            const container = document.getElementById('market-tokens-browser');
+            container.innerHTML = `
+                <div class="loading-market">
+                    <div class="spinner"></div>
+                    <p>Loading market data...</p>
+                </div>
+            `;
+
+            try {
+                // Fetch available tokens from server
+                const response = await fetch('/api/tokens');
+                const data = await response.json();
+
+                if (data.success && data.tokens) {
+                    displayMarketTokens(data.tokens);
+                } else {
+                    // Fallback to popular tokens
+                    const popularTokens = [
+                        { symbol: 'BTC', price: 0, change: 0, market: 'HyperLiquid', exchange: 'HYPERLIQUID' },
+                        { symbol: 'ETH', price: 0, change: 0, market: 'HyperLiquid', exchange: 'HYPERLIQUID' },
+                        { symbol: 'SOL', price: 0, change: 0, market: 'HyperLiquid', exchange: 'HYPERLIQUID' },
+                        { symbol: 'BNB', price: 0, change: 0, market: 'HyperLiquid', exchange: 'HYPERLIQUID' },
+                        { symbol: 'AVAX', price: 0, change: 0, market: 'HyperLiquid', exchange: 'HYPERLIQUID' },
+                        { symbol: 'DOGE', price: 0, change: 0, market: 'HyperLiquid', exchange: 'HYPERLIQUID' },
+                        { symbol: 'MATIC', price: 0, change: 0, market: 'HyperLiquid', exchange: 'HYPERLIQUID' },
+                        { symbol: 'DOT', price: 0, change: 0, market: 'HyperLiquid', exchange: 'HYPERLIQUID' }
+                    ];
+                    displayMarketTokens(popularTokens);
+                }
+            } catch (error) {
+                console.error('Error refreshing market data:', error);
+                container.innerHTML = `
+                    <div class="error-message">
+                        <p>❌ Failed to load market data</p>
+                        <button onclick="refreshMarketData()" style="margin-top: 10px; padding: 8px 16px; background: var(--accent-blue); color: white; border: none; border-radius: 6px; cursor: pointer;">Retry</button>
+                    </div>
+                `;
+            }
+        }
+
+        function displayMarketTokens(tokens) {
+            const container = document.getElementById('market-tokens-browser');
+
+            if (tokens.length === 0) {
+                container.innerHTML = `
+                    <div class="no-tokens">
+                        <p>No tokens available</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const tokensGrid = tokens.map(token => {
+                const isAdded = activeTokens.has(token.symbol);
+                const priceClass = token.change >= 0 ? 'positive' : 'negative';
+                const changeSymbol = token.change >= 0 ? '+' : '';
+
+                return `
+                    <div class="market-token-card">
+                        <div class="token-info">
+                            <div class="token-icon">${token.symbol.substring(0, 2)}</div>
+                            <div class="token-details">
+                                <div class="token-symbol">${token.symbol}</div>
+                                <div class="token-exchange">${token.exchange}</div>
+                            </div>
+                            <div class="price-source birdeye" data-tooltip="HyperLiquid API">HL</div>
+                        </div>
+                        <div class="token-price-row">
+                            <span class="token-price">$${token.price.toLocaleString()}</span>
+                            <span class="token-change ${priceClass}">${changeSymbol}${token.change.toFixed(2)}%</span>
+                        </div>
+                        <div class="token-actions">
+                            ${isAdded
+                                ? `<button class="token-action-btn added" disabled>
+                                     <i class="fas fa-check"></i> Added
+                                   </button>`
+                                : `<button class="token-action-btn add" onclick="addTokenFromMarket('${token.symbol}')">
+                                     <i class="fas fa-plus"></i> Add to Watchlist
+                                   </button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = `<div class="tokens-grid-compact">${tokensGrid}</div>`;
+        }
+
+        async function addTokenFromMarket(symbol) {
+            if (!activeTokens.has(symbol)) {
+                const tokenData = await fetchTokenData(symbol);
+                if (tokenData) {
+                    activeTokens.set(symbol, {
+                        ...tokenData,
+                        addedAt: new Date().toISOString(),
+                        position: null,
+                        alerts: []
+                    });
+
+                    updateTokensDisplay();
+                    updateTokenStats();
+                    refreshMarketData(); // Refresh market browser to update button states
+                    showNotification(`${symbol} added to watchlist`, 'success');
+                } else {
+                    showNotification(`Could not fetch data for ${symbol}`, 'error');
+                }
+            } else {
+                showNotification(`${symbol} is already in watchlist`, 'warning');
+            }
+        }
+
+        // ================================
+        // METAMASK/BRAVE WALLET INTEGRATION
+        // ================================
+
+        // Global wallet state
+        let connectedWallet = null;
+        let walletType = null; // 'metamask' or 'brave'
+
+        // Check if wallet is available
+        function isWalletAvailable() {
+            return typeof window !== 'undefined' && window.ethereum;
+        }
+
+        function getWalletType() {
+            if (!isWalletAvailable()) return null;
+            if (window.ethereum.isBraveWallet) return 'Brave Wallet';
+            if (window.ethereum.isMetaMask) return 'MetaMask';
+            return 'Wallet Ethereum';
+        }
+
+        // Update MetaMask status display
+        function updateMetaMaskStatusDisplay() {
+            const indicator = document.getElementById('metamask-indicator');
+            const statusText = document.getElementById('metamask-status-text');
+            const connectBtn = document.getElementById('metamask-connect-btn');
+
+            if (connectedWallet) {
+                indicator.style.background = 'var(--accent-green)';
+                statusText.textContent = `${walletType} - ${connectedWallet.address.substring(0, 6)}...${connectedWallet.address.substring(connectedWallet.address.length - 4)}`;
+                connectBtn.style.display = 'none';
+            } else {
+                indicator.style.background = '#6b7280';
+                statusText.textContent = 'Wallet';
+                connectBtn.style.display = 'inline-block';
+            }
+        }
+
+        // Connect wallet
+        async function connectMetaMask() {
+            if (!isWalletAvailable()) {
+                showNotification('Aucun wallet Ethereum détecté. Installez MetaMask ou Brave Wallet.', 'error');
+                return;
+            }
+
+            const connectBtn = document.getElementById('metamask-connect-btn');
+            connectBtn.disabled = true;
+            connectBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connexion...';
+
+            try {
+                // Request account access
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const account = accounts[0];
+
+                // Get network
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                const networkNames = {
+                    '0x1': 'Ethereum Mainnet',
+                    '0x5': 'Goerli Testnet',
+                    '0xaa36a7': 'Sepolia Testnet',
+                    '0x89': 'Polygon Mainnet',
+                    '0x13881': 'Mumbai Testnet'
+                };
+                const network = networkNames[chainId] || `Chain ID: ${chainId}`;
+
+                // Get balance
+                const balance = await window.ethereum.request({
+                    method: 'eth_getBalance',
+                    params: [account, 'latest']
+                });
+                const ethBalance = parseInt(balance, 16) / Math.pow(10, 18);
+
+                // Sign authentication message
+                const message = `Connexion à NOVAQUOTE Trading System\n\nAdresse: ${account}\nTimestamp: ${new Date().toISOString()}\n\nCette signature prouve la propriété de votre wallet.`;
+                const signature = await window.ethereum.request({
+                    method: 'personal_sign',
+                    params: [message, account]
+                });
+
+                // Authenticate with backend
+                const authResponse = await fetch('/api/wallet/authenticate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        account: account,
+                        signature: signature,
+                        message: message,
+                        wallet: getWalletType(),
+                        network: network
+                    })
+                });
+
+                const authData = await authResponse.json();
+
+                if (authData.success) {
+                    connectedWallet = {
+                        address: account,
+                        balance: `${ethBalance.toFixed(4)} ETH`,
+                        network: network,
+                        signature: signature,
+                        sessionToken: authData.sessionToken
+                    };
+                    walletType = getWalletType();
+
+                    updateMetaMaskStatusDisplay();
+
+                    // Store in localStorage for persistence
+                    localStorage.setItem('novaquote_wallet', JSON.stringify(connectedWallet));
+                    localStorage.setItem('novaquote_wallet_type', walletType);
+
+                    showNotification(`✅ Connecté à ${walletType} - ${account.substring(0, 6)}...${account.substring(account.length - 4)}`, 'success');
+
+                    // Refresh wallet balance display
+                    await updateWalletBalance('mainnet'); // Default to mainnet
+
+                } else {
+                    throw new Error(authData.error || 'Authentification échouée');
+                }
+
+            } catch (error) {
+                console.error('Erreur de connexion wallet:', error);
+                showNotification(`❌ Erreur de connexion: ${error.message}`, 'error');
+            } finally {
+                connectBtn.disabled = false;
+                connectBtn.innerHTML = '<i class="fab fa-ethereum"></i> Connect';
+            }
+        }
+
+        // Load wallet from localStorage on page load
+        function loadWalletFromStorage() {
+            const storedWallet = localStorage.getItem('novaquote_wallet');
+            const storedType = localStorage.getItem('novaquote_wallet_type');
+
+            if (storedWallet && storedType) {
+                connectedWallet = JSON.parse(storedWallet);
+                walletType = storedType;
+                updateMetaMaskStatusDisplay();
+                console.log('Wallet chargé depuis le stockage local');
+            }
+        }
+
+        // Listen for account changes
+        if (isWalletAvailable()) {
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                    connectedWallet = null;
+                    walletType = null;
+                    localStorage.removeItem('novaquote_wallet');
+                    localStorage.removeItem('novaquote_wallet_type');
+                    updateMetaMaskStatusDisplay();
+                } else if (accounts[0] !== connectedWallet?.address) {
+                    console.log('Changement de compte détecté');
+                    // Optionally auto-reconnect with new account
+                    connectedWallet = null;
+                    walletType = null;
+                    localStorage.removeItem('novaquote_wallet');
+                    localStorage.removeItem('novaquote_wallet_type');
+                    updateMetaMaskStatusDisplay();
+                }
+            });
+
+            window.ethereum.on('chainChanged', (chainId) => {
+                console.log('Changement de réseau détecté:', chainId);
+                if (connectedWallet) {
+                    // Update network info
+                    const networkNames = {
+                        '0x1': 'Ethereum Mainnet',
+                        '0x5': 'Goerli Testnet',
+                        '0xaa36a7': 'Sepolia Testnet',
+                        '0x89': 'Polygon Mainnet',
+                        '0x13881': 'Mumbai Testnet'
+                    };
+                    connectedWallet.network = networkNames[chainId] || `Chain ID: ${chainId}`;
+                    localStorage.setItem('novaquote_wallet', JSON.stringify(connectedWallet));
+                }
+            });
+        }
+
+        // Initialize MetaMask integration
+        document.addEventListener('DOMContentLoaded', function() {
+            // Load wallet from storage
+            loadWalletFromStorage();
+
+            // Setup MetaMask connection button
+            const connectBtn = document.getElementById('metamask-connect-btn');
+            if (connectBtn) {
+                connectBtn.addEventListener('click', connectMetaMask);
+            }
+
+            console.log('🔗 MetaMask integration initialized');
+        });
+    </script>
+</body>
+</html>

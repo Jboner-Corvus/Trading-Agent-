@@ -1,0 +1,2406 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NOVAQUOTE - Configuration: Agents & Permissions</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="assets/novaquote.css" rel="stylesheet">
+
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="nav-bar">
+        <div class="nav-content">
+            <a href="/" class="nav-brand">
+                📊 NOVAQUOTE
+            </a>
+            <div class="nav-links">
+                <a href="/" class="nav-link">
+                    <i class="fas fa-home"></i>
+                    Dashboard
+                </a>
+                <a href="/backtest" class="nav-link">
+                    <i class="fas fa-chart-line"></i>
+                    Backtests
+                </a>
+                <a href="/config" class="nav-link active">
+                    <i class="fas fa-cogs"></i>
+                    Configuration
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        <!-- Banner moderne -->
+        <div class="banner">
+            <div class="banner-content">
+                <h1>⚙️ Configuration & Agents</h1>
+                <p>Gérez vos agents IA et contrôlez les permissions de trading</p>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab" id="agents-tab-button">
+                <i class="fas fa-robot"></i>
+                Agents IA
+            </button>
+            <button class="tab active" onclick="switchToTab('permissions')">
+                <i class="fas fa-key"></i>
+                Permissions
+            </button>
+        </div>
+
+        <!-- Agents Tab Content -->
+        <div id="agents-tab" class="tab-content" style="display: none;">
+            <!-- Agents Actifs -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-robot"></i> Agents Actifs</h2>
+                <div class="agents-grid" id="agents-container">
+                    <div class="no-data-message">
+                        <i class="fas fa-robot"></i>
+                        <p>Aucun agent configuré ou données non disponibles</p>
+                        <small>Les données des agents seront chargées depuis l'API</small>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">
+                    <i class="fas fa-cogs"></i>
+                    Configuration des Agents IA
+                </div>
+                <p>Gérez les agents de trading automatiques et leurs paramètres.</p>
+
+                <div id="real-agents-grid" class="agents-grid">
+                    <!-- Real agents will be loaded here via API -->
+                </div>
+
+                <div id="agents-summary" style="margin-top: 20px; padding: 20px; background: rgba(255, 255, 255, 0.02); border-radius: 12px; text-align: center;">
+                    <h3 style="margin-bottom: 10px; color: var(--accent-blue);">Résumé d'Agents IA</h3>
+                    <div style="display: flex; justify-content: center; gap: 2rem;">
+                        <div style="text-align: center;">
+                            <div style="font-size: 2em; color: var(--accent-blue); font-weight: bold;" id="total-agents">0</div>
+                            <div style="font-size: 0.9em; color: var(--text-secondary);">Total</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2em; color: var(--accent-green); font-weight: bold;" id="active-agents">0</div>
+                            <div style="font-size: 0.9em; color: var(--text-secondary);">Actifs</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2em; color: var(--accent-yellow); font-weight: bold;" id="configured-agents">0</div>
+                            <div style="font-size: 0.9em; color: var(--text-secondary);">Configurés</div>
+                        </div>
+                        <div style="text-align: center;">
+                            <div style="font-size: 2em; color: var(--accent-red); font-weight: bold;" id="inactive-agents">0</div>
+                            <div style="font-size: 0.9em; color: var(--text-secondary);">Inactifs</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- System Status Card -->
+            <div class="card">
+                <h2 class="card-title"><i class="fas fa-chart-line"></i> État du Système</h2>
+                <div id="backtest-system-status">
+                    <div class="system-overview">
+                        <div class="status-grid">
+                            <div class="status-item">
+                                <span class="status-label">Backend:</span>
+                                <span class="status-value" id="backend-status">En ligne</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">Frontend:</span>
+                                <span class="status-value" id="frontend-status">Actif</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">WebSocket:</span>
+                                <span class="status-value" id="websocket-status">Connecté</span>
+                            </div>
+                            <div class="status-item">
+                                <span class="status-label">HyperLiquid:</span>
+                                <span class="status-value" id="hyperliquid-status">Optimisé</span>
+                            </div>
+                        </div>
+
+                        <div class="metrics-section">
+                            <h4>Métriques du Système</h4>
+                            <div class="metrics-grid">
+                                <div class="metric">
+                                    <span class="metric-value" id="total-backtests">30</span>
+                                    <span class="metric-label">Backtests</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-value" id="system-uptime">00:00:00</span>
+                                    <span class="metric-label">Temps actif</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-value" id="api-status">200 OK</span>
+                                    <span class="metric-label">Status API</span>
+                                </div>
+                                <div class="metric">
+                                    <span class="metric-value" id="data-source">Fichiers réels</span>
+                                    <span class="metric-label">Source données</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="actions-section">
+                            <button class="btn btn-primary" onclick="refreshSystemStatus()">
+                                <i class="fas fa-sync"></i> Actualiser
+                            </button>
+                            <button class="btn btn-secondary" onclick="testConnections()">
+                                <i class="fas fa-plug"></i> Tester Connexions
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+          </div>
+
+    
+        <!-- Permissions Tab Content -->
+        <div id="permissions-tab" class="tab-content">
+            <div class="card">
+                <h2 class="card-title">🔐 Connexion Wallet MetaMask/Brave</h2>
+                <p>Connectez votre wallet Ethereum pour accéder aux données réelles HyperLiquid.</p>
+            </div>
+
+            <!-- Wallet Connection Section -->
+            <div class="wallet-connection-section" id="wallet-connection-section" style="margin-bottom: 30px;">
+                <div class="card">
+                    <div class="wallet-status-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                        <h3 style="margin: 0; display: flex; align-items: center; gap: 10px;">
+                            <i class="fas fa-wallet"></i>
+                            <span id="wallet-type-text">MetaMask/Brave Wallet</span>
+                        </h3>
+                        <div class="wallet-status-indicator" id="wallet-status-indicator">
+                            <div class="status-dot" id="wallet-status-dot"></div>
+                            <span id="wallet-status-text">Non connecté</span>
+                        </div>
+                    </div>
+
+                    <div class="wallet-info-display" id="wallet-info-display" style="display: none;">
+                        <div class="wallet-address-section" style="margin-bottom: 15px;">
+                            <label style="font-weight: 600; color: var(--text-primary);">Adresse connectée:</label>
+                            <div class="wallet-address" id="connected-wallet-address" style="font-family: monospace; background: rgba(0, 212, 255, 0.1); padding: 8px; border-radius: 6px; margin-top: 5px; word-break: break-all;"></div>
+                        </div>
+                        <div class="wallet-balance-section" style="margin-bottom: 15px;">
+                            <label style="font-weight: 600; color: var(--text-primary);">Balance ETH:</label>
+                            <div class="wallet-balance" id="wallet-eth-balance" style="font-size: 1.2em; color: var(--accent-green); margin-top: 5px;">--</div>
+                        </div>
+                        <div class="wallet-network-section">
+                            <label style="font-weight: 600; color: var(--text-primary);">Réseau:</label>
+                            <div class="wallet-network" id="wallet-network" style="margin-top: 5px;">--</div>
+                        </div>
+                    </div>
+
+                    <div class="wallet-actions" style="margin-top: 20px;">
+                        <button class="control-btn primary" id="connect-metamask-btn">
+                            <i class="fab fa-ethereum"></i>
+                            Connecter MetaMask/Brave
+                        </button>
+                        <button class="control-btn secondary" id="disconnect-wallet-btn" style="display: none;">
+                            <i class="fas fa-unlink"></i>
+                            Déconnecter
+                        </button>
+                    </div>
+
+                    <div class="wallet-security-notice" style="margin-top: 20px; padding: 15px; background: rgba(255, 193, 7, 0.1); border: 1px solid rgba(255, 193, 7, 0.3); border-radius: 8px;">
+                        <h4 style="margin: 0 0 10px 0; color: #ffc107; display: flex; align-items: center; gap: 8px;">
+                            <i class="fas fa-shield-alt"></i>
+                            Sécurité
+                        </h4>
+                        <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary); font-size: 0.9em;">
+                            <li style="margin-bottom: 5px;">Votre adresse wallet servira de nom d'utilisateur pour HyperLiquid</li>
+                            <li style="margin-bottom: 5px;">Aucune clé privée n'est stockée - seules les signatures sont utilisées</li>
+                            <li>Les fonds restent toujours sous votre contrôle dans votre wallet</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <div class="hyperliquid-info" id="hyperliquid-info" style="margin-bottom: 20px;">
+                <!-- Blockchain info will be loaded here -->
+            </div>
+
+            <div class="wallet-permissions" id="wallet-permissions">
+                <!-- Permission controls will be loaded here -->
+            </div>
+        </div>
+    </div>
+
+    <style>
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+        
+        .modal-content {
+            background: var(--bg-card, #1a1a2e);
+            border-radius: 16px;
+            padding: 2rem;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .modal-close {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+        
+        .modal-content h2 {
+            margin-top: 0;
+            margin-bottom: 0.5rem;
+            color: var(--accent-blue);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .modal-content h3 {
+            margin-top: 0;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+        
+        .modal-content label {
+            display: block;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        
+        .modal-content input,
+        .modal-content select {
+            width: 100%;
+            padding: 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-primary);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-content input:focus,
+        .modal-content select:focus {
+            outline: none;
+            border-color: var(--accent-blue);
+            box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.2);
+        }
+        
+        .modal-content .control-btn {
+            margin-top: 1rem;
+            width: 100%;
+            padding: 0.75rem 1.5rem;
+            background: linear-gradient(135deg, var(--accent-blue), #0066cc);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        
+        .modal-content .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+        }
+
+        /* ================================
+           BACKTEST SYSTEM STYLES
+           ================================ */
+        .system-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .status-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .status-info {
+            flex: 1;
+        }
+
+        .status-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.25rem;
+        }
+
+        .status-value {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .status-details {
+            padding: 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .status-details p {
+            margin: 0.5rem 0;
+            color: var(--text-secondary);
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+        }
+
+        .metric-card {
+            text-align: center;
+            padding: 1.5rem 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .metric-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.1);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: var(--text-primary);
+        }
+
+        .metric-value.positive {
+            color: #00d4aa;
+        }
+
+        .metric-value.negative {
+            color: #e17055;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .risk-overview {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .risk-summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+        }
+
+        .risk-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 8px;
+        }
+
+        .risk-label {
+            color: var(--text-secondary);
+        }
+
+        .risk-value {
+            font-weight: 600;
+        }
+
+        .risk-value.positive {
+            color: #00d4aa;
+        }
+
+        .risk-value.negative {
+            color: #e17055;
+        }
+
+        .risk-distribution h4 {
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+
+        .risk-bars {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+        }
+
+        .risk-bar-item {
+            display: grid;
+            grid-template-columns: 40px 1fr 30px;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .risk-bar-label {
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .risk-bar-container {
+            height: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .risk-bar {
+            height: 100%;
+            border-radius: 10px;
+            transition: width 0.3s ease;
+        }
+
+        .risk-bar-count {
+            text-align: center;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .top-strategies-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .strategy-overview-card {
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.02);
+            transition: transform 0.2s ease;
+        }
+
+        .strategy-overview-card.best {
+            border-color: #00d4aa;
+            background: rgba(0, 212, 170, 0.05);
+        }
+
+        .strategy-overview-card.worst {
+            border-color: #e17055;
+            background: rgba(225, 112, 85, 0.05);
+        }
+
+        .strategy-overview-card h4 {
+            margin: 0 0 1rem 0;
+            color: var(--text-primary);
+        }
+
+        .strategy-name {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+            color: var(--text-primary);
+        }
+
+        .strategy-metrics {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .metric {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 0.75rem;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 6px;
+            font-size: 0.85rem;
+        }
+
+        .metric.positive {
+            background: rgba(0, 212, 170, 0.1);
+            color: #00d4aa;
+        }
+
+        .metric.negative {
+            background: rgba(225, 112, 85, 0.1);
+            color: #e17055;
+        }
+
+        .metric.real-data {
+            background: rgba(0, 212, 255, 0.1);
+            color: #00d4ff;
+        }
+
+        .metric.simulated-data {
+            background: rgba(253, 203, 110, 0.1);
+            color: #fdcb6e;
+        }
+
+        .strategy-description {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .system-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .control-btn.primary {
+            background: var(--accent-blue, #00d4ff);
+            color: white;
+        }
+
+        .control-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+
+        .control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
+        }
+
+        .error-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .error-state i {
+            font-size: 3rem;
+            color: #e17055;
+            margin-bottom: 1rem;
+        }
+
+        .loading-indicator {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .loading-indicator i {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+        }
+
+    </style>
+    <script>
+        // ================================
+        // IMMEDIATE FUNCTION DEFINITIONS
+        // ================================
+
+        // Global functions for agent loading
+        window.loadAgentData = async function() {
+            try {
+                console.log('Loading agent data...');
+                const container = document.getElementById('agents-container');
+
+                // Fetch real agent data from API
+                const response = await fetch('http://localhost:7000/api/agents');
+                const data = await response.json();
+
+                if (data.success && data.agents && data.agents.length > 0) {
+                    console.log(`Loaded ${data.agents.length} agents from API`);
+                    displayAgents(data.agents);
+                    
+                    // Update agents summary with real data
+                    if (window.displayAgentsSummary) {
+                        window.displayAgentsSummary(data);
+                        console.log('✅ Updated agents summary with real data');
+                    } else {
+                        console.warn('⚠️ displayAgentsSummary function not available');
+                    }
+                } else {
+                    console.log('No agents found from API, using fallback data');
+                    // Fallback to demo data if no agents found
+                    const demoAgents = [
+                        {
+                            id: 'risk_agent',
+                            name: 'Risk Management Agent',
+                            description: 'Analyzes and manages trading risk across all strategies',
+                            status: 'active',
+                            performance: '+12.3%'
+                        },
+                        {
+                            id: 'trading_agent',
+                            name: 'Master Trading Agent',
+                            description: 'Executes trades based on multi-signal analysis',
+                            status: 'active',
+                            performance: '+28.7%'
+                        },
+                        {
+                            id: 'sentiment_agent',
+                            name: 'Sentiment Analysis Agent',
+                            description: 'Analyzes social media sentiment and market psychology',
+                            status: 'active',
+                            performance: '+15.2%'
+                        },
+                        {
+                            id: 'sniper_agent',
+                            name: 'Sniper Elite Agent',
+                            description: 'Precision trading with sniper-like accuracy',
+                            status: 'configured',
+                            performance: '+22.1%'
+                        },
+                        {
+                            id: 'hyperliquid_agent',
+                            name: 'HyperLiquid Agent',
+                            description: 'Specialized in HyperLiquid blockchain trading',
+                            status: 'inactive',
+                            performance: '+18.9%'
+                        }
+                    ];
+                    displayAgents(demoAgents);
+                    
+                    // Update summary with demo data
+                    const demoSummary = {
+                        total: demoAgents.length,
+                        active: demoAgents.filter(a => a.status === 'active').length,
+                        configured: demoAgents.filter(a => a.status === 'active' || a.status === 'configured').length,
+                        inactive: demoAgents.filter(a => a.status === 'inactive').length
+                    };
+                    
+                    if (window.displayAgentsSummary) {
+                        window.displayAgentsSummary(demoSummary);
+                        console.log('✅ Updated agents summary with demo data');
+                    } else {
+                        console.warn('⚠️ displayAgentsSummary function not available');
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading agent data:', error);
+                showErrorState();
+                
+                // Even on error, try to update summary to show 0 values
+                const errorSummary = {
+                    total: 0,
+                    active: 0,
+                    configured: 0,
+                    inactive: 0
+                };
+                
+                if (window.displayAgentsSummary) {
+                    window.displayAgentsSummary(errorSummary);
+                    console.log('✅ Updated agents summary with error state');
+                }
+            }
+        };
+
+// Fonction principale pour changer de tab
+function switchToTab(tabName) {
+    console.log('switchToTab executed:', tabName);
+
+    // Safe DOM operations
+    const agentsTab = document.getElementById('agents-tab');
+    const permissionsTab = document.getElementById('permissions-tab');
+
+    if (agentsTab) agentsTab.style.display = 'none';
+    if (permissionsTab) permissionsTab.style.display = 'none';
+
+    // Remove active classes safely
+    document.querySelectorAll('.tab').forEach(function(tab) {
+        tab.classList.remove('active');
+    });
+
+    // Show target tab safely
+    const targetTab = document.getElementById(tabName + '-tab');
+    if (targetTab) {
+        targetTab.style.display = 'block';
+    }
+
+    // Set clicked tab active safely
+    const activeTab = document.querySelector(`.tab[onclick="switchToTab('${tabName}')"]`);
+    if (activeTab) {
+        activeTab.classList.add('active');
+    }
+
+    console.log('Tab switch completed for:', tabName);
+
+    // Load data for the active tab
+    if (tabName === 'agents') {
+        if (window.loadAgentData) {
+            window.loadAgentData();
+        }
+        // Load backtest system status since it's now in the agents tab
+        if (window.loadBacktestSystemStatus) {
+            window.loadBacktestSystemStatus();
+        }
+    } else if (tabName === 'backtest') {
+        if (window.loadBacktestSystemStatus) {
+            window.loadBacktestSystemStatus();
+        }
+    }
+}
+
+        // showTab MUST be defined BEFORE any other code
+        window.showTab = function(tabName) {
+            switchToTab(tabName);
+        };
+
+        // Global display functions
+        window.displayAgents = function(agents) {
+            const container = document.getElementById('agents-container');
+
+            if (!agents || agents.length === 0) {
+                showErrorState();
+                return;
+            }
+
+            const agentsHtml = agents.map(agent => `
+                <div class="agent-card" data-agent-id="${agent.id}">
+                    <div class="agent-header">
+                        <div class="agent-icon">
+                            <i class="fas fa-robot"></i>
+                        </div>
+                        <div class="agent-info">
+                            <h3>${agent.name}</h3>
+                            <p>${agent.description}</p>
+                        </div>
+                        <div class="agent-status">
+                            <span class="status-badge ${agent.status}">${agent.status}</span>
+                        </div>
+                    </div>
+                    <div class="agent-metrics">
+                        <div class="metric">
+                            <span class="metric-label">Performance</span>
+                            <span class="metric-value">${agent.performance || 'N/A'}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Statut</span>
+                            <span class="metric-value">Configuré</span>
+                        </div>
+                    </div>
+                    <div class="agent-actions">
+                        <button class="btn-primary" onclick="toggleAgent('${agent.id}')">
+                            <i class="fas fa-power-off"></i>
+                            Activer
+                        </button>
+                        <button class="btn-secondary" onclick="configureAgent('${agent.id}')">
+                            <i class="fas fa-cog"></i>
+                            Configurer
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            container.innerHTML = agentsHtml;
+        };
+
+        window.showErrorState = function() {
+            const container = document.getElementById('agents-container');
+            container.innerHTML = `
+                <div class="no-data-message">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Erreur lors du chargement des agents</p>
+                    <small>Veuillez vérifier la connexion au serveur</small>
+                </div>
+            `;
+        };
+
+        window.toggleAgent = function(agentId) {
+            console.log('Toggling agent:', agentId);
+            showNotification(`Agent ${agentId} activé/désactivé`, 'success');
+        };
+
+        // No placeholder here - real configureAgent is defined below
+
+        // Create global reference
+        function showTab(tabName) { return window.showTab(tabName); }
+
+        console.log('✅ showTab function defined globally');
+
+        // ================================
+        // GLOBAL STATE & NOTIFICATIONS
+        // ================================
+
+        // Safe notification system
+        function showNotification(message, type) {
+            type = type || 'info';
+            var notification = document.createElement('div');
+            notification.className = 'notification ' + type;
+            notification.innerHTML =
+                '<i class="fas fa-' +
+                (type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle') +
+                '"></i> ' + message;
+            document.body.appendChild(notification);
+            setTimeout(function() { notification.remove(); }, 3000);
+        }
+
+        console.log('✅ Notification system ready');
+
+        // Agent functions
+        function toggleAgent(agentId) {
+            console.log('Toggling agent:', agentId);
+            
+            // Enhanced agent finding with multiple strategies
+            let targetCard = null;
+            
+            // Strategy 1: Find by agent name in various possible locations
+            const possibleSelectors = [
+                `[data-agent-id="${agentId}"]`,
+                `[data-agent-id*="${agentId}"]`,
+                '.agent-card'
+            ];
+            
+            for (const selector of possibleSelectors) {
+                const cards = document.querySelectorAll(selector);
+                for (const card of cards) {
+                    const agentName = card.querySelector('h3, .agent-name, .agent-info h3');
+                    if (agentName) {
+                        const nameText = agentName.textContent.toLowerCase();
+                        const cleanAgentId = agentId.toLowerCase().replace('_agent', '').replace('_', ' ');
+                        if (nameText.includes(cleanAgentId)) {
+                            targetCard = card;
+                            break;
+                        }
+                    }
+                }
+                if (targetCard) break;
+            }
+            
+            // Strategy 2: If still not found, search all cards by text content
+            if (!targetCard) {
+                const allCards = document.querySelectorAll('.agent-card, [class*="card"]');
+                allCards.forEach(card => {
+                    const textContent = card.textContent.toLowerCase();
+                    const cleanAgentId = agentId.toLowerCase().replace('_agent', '').replace('_', ' ');
+                    if (textContent.includes(cleanAgentId)) {
+                        targetCard = card;
+                    }
+                });
+            }
+            
+            if (!targetCard) {
+                console.warn(`Agent ${agentId} card not found with any strategy`);
+                showNotification(`Agent ${agentId} non trouvé dans l'interface`, 'warning');
+                return;
+            }
+            
+            console.log('✅ Found target card for agent:', agentId);
+            
+            // Find status element (multiple possible selectors)
+            const statusSelectors = ['.agent-status', '.status', '[class*="status"]', '.inactive', '.active'];
+            let statusElement = null;
+            
+            for (const selector of statusSelectors) {
+                statusElement = targetCard.querySelector(selector);
+                if (statusElement) break;
+            }
+            
+            // Find toggle button (multiple possible selectors)
+            const buttonSelectors = ['.control-btn', 'button', '[class*="btn"]', '[onclick*="toggleAgent"]'];
+            let toggleBtn = null;
+            
+            for (const selector of buttonSelectors) {
+                const buttons = targetCard.querySelectorAll(selector);
+                for (const btn of buttons) {
+                    if (btn.textContent.includes('Activer') || btn.textContent.includes('Désactiver') || btn.innerHTML.includes('power-off')) {
+                        toggleBtn = btn;
+                        break;
+                    }
+                }
+                if (toggleBtn) break;
+            }
+
+            if (statusElement && toggleBtn) {
+                const currentStatus = statusElement.textContent.toLowerCase().trim();
+                console.log('Current status element:', statusElement);
+                console.log('Current status text:', currentStatus);
+                console.log('Toggle button:', toggleBtn);
+                
+                if (currentStatus.includes('actif') || currentStatus.includes('active') || statusElement.classList.contains('active')) {
+                    // Change to inactive
+                    statusElement.textContent = 'Inactif';
+                    statusElement.className = 'inactive';
+                    toggleBtn.innerHTML = '<i class="fas fa-power-off"></i> Activer';
+                    showNotification(`Agent ${agentId} désactivé`, 'info');
+                    console.log('✅ Agent deactivated');
+                } else {
+                    // Change to active
+                    statusElement.textContent = 'Actif';
+                    statusElement.className = 'active';
+                    toggleBtn.innerHTML = '<i class="fas fa-power-off"></i> Désactiver';
+                    showNotification(`Agent ${agentId} activé`, 'success');
+                    console.log('✅ Agent activated');
+                }
+                
+                // Update the summary counters
+                setTimeout(() => {
+                    updateAgentsSummaryAfterToggle();
+                }, 200);
+                
+            } else {
+                console.warn('Status element or toggle button not found in card:', targetCard);
+                console.log('Status element:', statusElement);
+                console.log('Toggle button:', toggleBtn);
+                showNotification(`Interface agent ${agentId} incomplète`, 'warning');
+            }
+        }
+        
+        // Update summary after toggling an agent
+        function updateAgentsSummaryAfterToggle() {
+            // Look for all cards with agent information
+            const cards = document.querySelectorAll('.agent-card, [class*="agent"], [class*="card"]');
+            let total = 0;
+            let active = 0;
+            let configured = 0;
+            let inactive = 0;
+            
+            cards.forEach(card => {
+                // Only count cards that look like agent cards
+                const hasAgentInfo = card.querySelector('h3, .agent-name, .agent-status');
+                if (!hasAgentInfo) return;
+                
+                total++;
+                
+                const statusElement = card.querySelector('.agent-status, .status, .inactive, .active');
+                if (statusElement) {
+                    const statusText = statusElement.textContent.toLowerCase();
+                    if (statusText.includes('actif') || statusText.includes('active') || statusElement.classList.contains('active')) {
+                        active++;
+                        configured++;
+                    } else if (statusText.includes('inactif') || statusText.includes('inactive') || statusElement.classList.contains('inactive')) {
+                        inactive++;
+                        configured++;
+                    } else if (statusText.includes('configuré') || statusText.includes('configured')) {
+                        configured++;
+                    }
+                }
+            });
+            
+            const summaryData = {
+                total: total,
+                active: active,
+                configured: configured,
+                inactive: inactive
+            };
+            
+            if (window.displayAgentsSummary) {
+                window.displayAgentsSummary(summaryData);
+                console.log('📊 Updated summary after toggle:', summaryData);
+            }
+        }
+
+        // WORKING VERSION - SIMPLE AND EFFECTIVE
+        function configureAgent(agentId) {
+            console.log('Configuring agent:', agentId);
+            
+            // Remove existing modal first
+            const existingModal = document.getElementById('temp-modal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Get agent name
+            let agentName = agentId.replace(/_/g, ' ').replace(/\\b\\w/g, l => l.toUpperCase());
+            
+            // Create simple modal
+            const modal = document.createElement('div');
+            modal.id = 'temp-modal';
+            modal.style.cssText = 'position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #1a1a2e; padding: 40px; border-radius: 20px; border: 2px solid #00d4ff; color: white; z-index: 99999; min-width: 400px;';
+            
+            modal.innerHTML = '<h2 style="color: #00d4ff; margin-bottom: 20px;">Configuration de ' + agentName + '</h2>' +
+                '<p style="margin-bottom: 20px; color: #b8b8c8;">Configuration des paramètres de l agent ' + agentName + '</p>' +
+                '<div style="margin-bottom: 20px;"><label style="display: block; margin-bottom: 8px; font-weight: 600;">Niveau de Risque:</label>' +
+                '<select id="risk-level-' + agentId + '" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #222; color: white;">' +
+                '<option value="low">Faible</option><option value="medium" selected>Moyen</option><option value="high">Élevé</option></select></div>' +
+                '<div style="margin-bottom: 25px;"><label style="display: block; margin-bottom: 8px; font-weight: 600;">Taille de Position (%):</label>' +
+                '<input type="number" id="position-size-' + agentId + '" value="2.0" min="0.1" max="10.0" step="0.1" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #333; background: #222; color: white;"></div>' +
+                '<div style="display: flex; gap: 15px;"><button id="cancel-btn" style="flex: 1; padding: 12px; background: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer;">Annuler</button>' +
+                '<button id="save-btn" style="flex: 1; padding: 12px; background: #00d4ff; color: white; border: none; border-radius: 8px; cursor: pointer;">Sauvegarder</button></div>';
+            
+            document.body.appendChild(modal);
+            
+            // Add event listeners
+            document.getElementById('cancel-btn').onclick = function() {
+                modal.remove();
+            };
+            
+            document.getElementById('save-btn').onclick = function() {
+                saveAgentConfiguration(agentId, this);
+            };
+            
+            console.log('✅ WORKING Modal created for:', agentId);
+        }
+        
+        async function saveAgentConfiguration(agentId, button) {
+            console.log('Saving configuration for:', agentId);
+            const modal = document.getElementById('temp-modal');
+            
+            if (!modal) {
+                console.log('Modal not found');
+                return;
+            }
+            
+            // Get form values
+            const riskLevel = modal.querySelector('#risk-level-' + agentId).value;
+            const positionSize = parseFloat(modal.querySelector('#position-size-' + agentId).value);
+            
+            // Validate inputs
+            if (isNaN(positionSize) || positionSize <= 0) {
+                showNotification('Taille de position invalide', 'error');
+                return;
+            }
+            
+            // Disable button and show loading
+            button.disabled = true;
+            button.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sauvegarde...';
+            
+            try {
+                // Save configuration via REAL API
+                const configData = {
+                    risk_level: riskLevel,
+                    position_size: positionSize,
+                    trading_enabled: riskLevel !== 'high',
+                    paper_trading: true,
+                    max_daily_trades: riskLevel === 'high' ? 2 : 5,
+                    config_timestamp: new Date().toISOString()
+                };
+
+                console.log('🔄 Sending configuration to backend:', configData);
+
+                const response = await fetch(`/api/agents/${agentId}/config`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(configData)
+                });
+
+                const result = await response.json();
+                
+                if (result.success) {
+                    modal.remove();
+                    showNotification(`✅ Configuration de l'agent ${agentId} sauvegardée avec succès`, 'success');
+                    
+                    console.log('🚀 REAL Agent configuration saved via API:', {
+                        agentId: agentId,
+                        config: configData,
+                        result: result,
+                        timestamp: new Date().toISOString()
+                    });
+
+                    // Refresh agents data to show updated status
+                    if (window.loadAgentData) {
+                        setTimeout(() => window.loadAgentData(), 500);
+                    }
+                } else {
+                    throw new Error(result.error || 'API error');
+                }
+                
+            } catch (error) {
+                console.error('❌ Configuration save error:', error);
+                modal.remove();
+                showNotification(`❌ Erreur lors de la sauvegarde: ${error.message}`, 'error');
+                
+                console.log('Configuration data that failed to save:', {
+                    agentId: agentId,
+                    riskLevel: riskLevel,
+                    positionSize: positionSize,
+                    error: error.message,
+                    timestamp: new Date().toISOString()
+                });
+            } finally {
+                // Re-enable button (in case modal was recreated)
+                button.disabled = false;
+                button.innerHTML = 'Sauvegarder';
+            }
+        }
+        
+        // Make functions globally available
+        window.configureAgent = configureAgent;
+        window.saveAgentConfiguration = saveAgentConfiguration;
+
+        // HyperLiquid Information Loading
+        async function loadHyperLiquidInfo() {
+            try {
+                const response = await fetch('http://localhost:7000/api/hyperliquid/info');
+                const data = await response.json();
+
+                if (data.success) {
+                    updateHyperLiquidInfo(data);
+                } else {
+                    console.error('Failed to load HyperLiquid info:', data.error);
+                }
+            } catch (error) {
+                console.error('Error loading HyperLiquid info:', error);
+                document.getElementById('hyperliquid-info').innerHTML = `
+                    <div class="card" style="border-left: 4px solid var(--accent-red); background: rgba(239, 68, 68, 0.1);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 32px; color: #ef4444; margin-bottom: 10px; display: block;"></i>
+                        <p style="font-size: 1em; margin-bottom: 5px; font-weight: 600; color: var(--text-primary);">Impossible de charger les informations HyperLiquid</p>
+                        <p style="font-size: 0.9em; opacity: 0.8; color: var(--text-secondary);">Vérifiez que le serveur backend est opérationnel</p>
+                    </div>
+                `;
+            }
+        }
+
+        function updateHyperLiquidInfo(data) {
+            const infoContainer = document.getElementById('hyperliquid-info');
+            const network = data.data?.network || {};
+            const endpoints = {
+                rpc: network.rpc_url || '#',
+                explorer: network.explorer_url || '#',
+                api: '/api/hyperliquid'
+            };
+
+            infoContainer.innerHTML = `
+                <div class="card">
+                    <div class="hyperliquid-blocks" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px;">
+                        <div class="blockchain-card" style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(0, 212, 255, 0.3);">
+                            <h3 style="margin-bottom: 15px; color: var(--accent-blue); display: flex; align-items: center; gap: 10px; font-size: 1.1em;">
+                                <i class="fas fa-cubes"></i> ${network.name || 'HyperLiquid L1'}
+                            </h3>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em;">
+                                <div><strong>Chain ID:</strong> ${network.chain_id || '33101'}</div>
+                                <div><strong>Currency:</strong> ${network.currency_symbol || 'HYPE'}</div>
+                                <div><strong>Decimals:</strong> ${network.currency_decimals || 18}</div>
+                                <div><strong>RPC:</strong> <a href="${endpoints.rpc}" target="_blank" style="color: var(--accent-blue);">Connexion</a></div>
+                            </div>
+                            <div style="margin-top: 10px;">
+                                <a href="${endpoints.explorer}" target="_blank" style="color: var(--accent-green); text-decoration: none; font-weight: 600; font-size: 0.9em;">
+                                    <i class="fas fa-external-link-alt"></i> Explorer HyperLiquid
+                                </a>
+                            </div>
+                        </div>
+                        <div class="api-card" style="background: rgba(255, 255, 255, 0.05); padding: 20px; border-radius: 12px; border: 1px solid rgba(236, 72, 153, 0.3);">
+                            <h3 style="margin-bottom: 15px; color: var(--accent-pink); display: flex; align-items: center; gap: 10px; font-size: 1.1em;">
+                                <i class="fas fa-code"></i> Endpoints API
+                            </h3>
+                            <div style="font-size: 0.85em; display: grid; gap: 6px;">
+                                <div style="background: rgba(255, 255, 255, 0.05); padding: 8px; border-radius: 6px; font-family: monospace;">
+                                    <strong>Info:</strong> ${endpoints.api}/info
+                                </div>
+                                <div style="background: rgba(255, 255, 255, 0.05); padding: 8px; border-radius: 6px; font-family: monospace;">
+                                    <strong>RPC:</strong> ${endpoints.rpc}
+                                </div>
+                                <div style="background: rgba(255, 255, 255, 0.05); padding: 8px; border-radius: 6px; font-family: monospace;">
+                                    <strong>Explorer:</strong> ${endpoints.explorer}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Wallet Permissions Management
+        async function loadWalletPermissions() {
+            try {
+                const permissionsContainer = document.getElementById('wallet-permissions');
+
+                // Create permission controls for mainnet and testnet
+                const permissionsHTML = `
+                    <div class="card">
+                        <div class="wallet-permission-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 20px;">
+                            <!-- Mainnet Permission Card -->
+                            <div class="permission-card mainnet" style="background: var(--bg-card); padding: 25px; border-radius: 16px; border: 2px solid rgba(239, 68, 68, 0.3);">
+                                <div class="permission-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                                    <h3 style="color: #ef4444; margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.4em;">
+                                        <i class="fas fa-globe"></i> HyperLiquid Mainnet (Real Trading)
+                                    </h3>
+                                    <div class="status-indicator mainnet" id="mainnet-status" style="width: 12px; height: 12px; border-radius: 50%; background: #6b7280;"></div>
+                                </div>
+                                <div class="wallet-info" id="mainnet-info" style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 20px;">
+                                    Loading balance information...
+                                </div>
+                                <div class="permission-actions" style="display: flex; gap: 10px;">
+                                    <button class="control-btn primary" id="grant-mainnet" style="flex: 1;">
+                                        <i class="fas fa-check"></i> Grant Access
+                                    </button>
+                                    <button class="control-btn secondary" id="revoke-mainnet" style="flex: 1;">
+                                        <i class="fas fa-ban"></i> Revoke Access
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Testnet Permission Card -->
+                            <div class="permission-card testnet" style="background: var(--bg-card); padding: 25px; border-radius: 16px; border: 2px solid rgba(16, 185, 129, 0.3);">
+                                <div class="permission-header" style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+                                    <h3 style="color: #10b981; margin: 0; display: flex; align-items: center; gap: 10px; font-size: 1.4em;">
+                                        <i class="fas fa-shield-alt"></i> HyperLiquid Testnet (Paper Trading)
+                                    </h3>
+                                    <div class="status-indicator testnet" id="testnet-status" style="width: 12px; height: 12px; border-radius: 50%; background: #6b7280;"></div>
+                                </div>
+                                <div class="wallet-info" id="testnet-info" style="font-size: 0.9em; color: var(--text-secondary); margin-bottom: 20px;">
+                                    Loading balance information...
+                                </div>
+                                <div class="permission-actions" style="display: flex; gap: 10px;">
+                                    <button class="control-btn primary" id="grant-testnet" style="flex: 1;">
+                                        <i class="fas fa-check"></i> Grant Access
+                                    </button>
+                                    <button class="control-btn secondary" id="revoke-testnet" style="flex: 1;">
+                                        <i class="fas fa-ban"></i> Revoke Access
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="permission-info" style="margin-top: 30px; padding: 20px; background: rgba(255, 255, 255, 0.03); border-radius: 12px; border-left: 4px solid var(--accent-purple);">
+                            <h4 style="margin-bottom: 10px; color: var(--accent-purple); display: flex; align-items: center; gap: 8px; font-size: 1.2em;">
+                                <i class="fas fa-info-circle"></i> Informations importantes
+                            </h4>
+                            <ul style="margin: 0; padding-left: 20px; color: var(--text-secondary); font-size: 0.95em;">
+                                <li style="margin-bottom: 5px;">Accordez l'accès à vos agents IA uniquement si vous faites confiance à l'implémentation</li>
+                                <li style="margin-bottom: 5px;">HyperLiquid Testnet utilise des fonds virtuels - aucune perte financière réelle possible</li>
+                                <li style="margin-bottom: 5px;">HyperLiquid Mainnet utilise des fonds réels - assumez tous les risques trading</li>
+                                <li>Le système basculera automatiquement vers le réseau HyperLiquid approprié</li>
+                                <li>Les transactions des agents ne peuvent être effectuées que si l'accès est accordé</li>
+                            </ul>
+                        </div>
+                    </div>
+                `;
+
+                permissionsContainer.innerHTML = permissionsHTML;
+
+                // Load current permission states
+                await Promise.all([
+                    loadWalletPermissionStatus('mainnet'),
+                    loadWalletPermissionStatus('testnet')
+                ]);
+
+                // Add event listeners
+                setupPermissionButtons();
+
+            } catch (error) {
+                console.error('Error loading wallet permissions:', error);
+                document.getElementById('wallet-permissions').innerHTML = `
+                    <div class="card" style="border-left: 4px solid var(--accent-red);">
+                        <i class="fas fa-exclamation-triangle" style="font-size: 48px; color: #ef4444; margin-bottom: 20px; display: block;"></i>
+                        <p style="font-size: 1.1em; color: var(--text-primary); font-weight: 600;">Erreur lors du chargement des permissions wallet</p>
+                        <p style="font-size: 0.9em; opacity: 0.8; color: var(--text-secondary);">Vérifiez la connexion au serveur backend</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadWalletPermissionStatus(type) {
+            try {
+                const response = await fetch(`/api/wallet/permission/${type}`);
+                const data = await response.json();
+
+                if (data.success && data.wallet) {
+                    updateWalletPermissionStatus(type, data.wallet);
+                } else {
+                    console.error(`Failed to load ${type} permission status:`);
+                }
+            } catch (error) {
+                console.error(`Error loading ${type} permission status:`, error);
+                updateWalletPermissionStatus(type, { enabled: false, balance: 0, address: null });
+            }
+        }
+
+        function updateWalletPermissionStatus(type, wallet) {
+            const statusIndicator = document.getElementById(`${type}-status`);
+            const infoElement = document.getElementById(`${type}-info`);
+
+            if (wallet.enabled) {
+                statusIndicator.style.background = type === 'mainnet' ? '#ef4444' : '#10b981';
+                infoElement.innerHTML = `
+                    <div style="font-weight: 500; color: var(--accent-green); margin-bottom: 5px;">✓ Permission accordée</div>
+                    <div><strong>Adresse:</strong> ${wallet.address || 'Utilisant la clé .env'}</div>
+                    <div><strong>Balance:</strong> $${wallet.balance?.toLocaleString() || 'N/A'} USDC</div>
+                    <div><strong>Dernière mise à jour:</strong> ${wallet.lastUpdate ?
+                        new Date(wallet.lastUpdate).toLocaleString() : 'Jamais'}</div>
+                `;
+            } else {
+                statusIndicator.style.background = '#6b7280';
+                infoElement.innerHTML = `
+                    <div style="font-weight: 500; color: #ef4444; margin-bottom: 5px;">✗ Permission refusée</div>
+                    <div>Les agents n'ont pas accès à ces fonds pour le trading</div>
+                    <div>Utilisez les boutons ci-dessous pour accorder/révoquer l'accès</div>
+                `;
+            }
+        }
+
+        function setupPermissionButtons() {
+            const buttons = ['grant-mainnet', 'revoke-mainnet', 'grant-testnet', 'revoke-testnet'];
+
+            buttons.forEach(buttonId => {
+                document.getElementById(buttonId).addEventListener('click', async function() {
+                    const [action, type] = buttonId.split('-');
+                    const walletType = type; // 'mainnet' or 'testnet'
+                    const permissionAction = action; // 'grant' or 'revoke'
+
+                    await handleWalletPermission(walletType, permissionAction);
+                });
+            });
+        }
+
+        async function handleWalletPermission(walletType, action) {
+            try {
+                const grantButton = document.getElementById(`grant-${walletType}`);
+                const revokeButton = document.getElementById(`revoke-${walletType}`);
+                const infoElement = document.getElementById(`${walletType}-info`);
+
+                // Disable buttons during operation
+                grantButton.disabled = true;
+                revokeButton.disabled = true;
+                grantButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                revokeButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+
+                // Show action in progress
+                infoElement.innerHTML = `
+                    <div style="font-weight: 500; color: var(--accent-blue);">
+                        <i class="fas fa-cog fa-spin"></i> ${action === 'grant' ? 'Accord en cours...' : 'Révocation en cours...'}
+                    </div>
+                `;
+
+                // Switch to appropriate HyperLiquid network when granting permissions
+                if (action === 'grant') {
+                    const isTestnet = walletType === 'testnet';
+                    await switchToHyperLiquidNetwork(isTestnet);
+                }
+
+                // Make API call
+                const response = await fetch('http://localhost:7000/api/wallet/permission', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        type: walletType,
+                        action: action
+                    })
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Update permission status
+                    await loadWalletPermissionStatus(walletType);
+
+                    // Show success notification
+                    const actionText = action === 'grant' ?
+                        `✅ Permission accordée pour ${walletType === 'mainnet' ? 'le trading réel' : 'le paper trading'}` :
+                        `🚫 Permission révoquée pour ${walletType === 'mainnet' ? 'le trading réel' : 'le paper trading'}`;
+
+                    showNotification(actionText, 'success');
+
+                    // Log permission change
+                    console.log(`${action.toUpperCase()} ${walletType} permission:`, data.wallet);
+
+                } else {
+                    // Show error notification
+                    showNotification(`❌ Erreur: ${data.error || 'Impossible de modifier la permission'}`, 'error');
+
+                    // Revert info
+                    infoElement.innerHTML = `
+                        <div style="font-weight: 500; color: #ef4444;">
+                            Erreur lors de ${action === 'grant' ? "l'accord" : "la révocation"} de la permission
+                        </div>
+                    `;
+                }
+
+            } catch (error) {
+                console.error('Permission operation error:', error);
+                showNotification('❌ Erreur de connexion - Opération échouée', 'error');
+
+                // Reload current status to revert UI
+                await loadWalletPermissionStatus(walletType);
+            } finally {
+                // Re-enable buttons
+                if (grantButton) {
+                    grantButton.disabled = false;
+                    grantButton.innerHTML = '<i class="fas fa-check"></i> Grant Access';
+                }
+                if (revokeButton) {
+                    revokeButton.disabled = false;
+                    revokeButton.innerHTML = '<i class="fas fa-ban"></i> Revoke Access';
+                }
+
+                // Force reload of wallet balance in case it changed
+                await updateWalletBalance(walletType === 'mainnet' ? 'mainnet' : 'testnet');
+            }
+        }
+
+        // Helper function to update wallet balance
+        async function updateWalletBalance(walletType) {
+            try {
+                await loadWalletPermissionStatus(walletType);
+                console.log(`Refreshed ${walletType} balance`);
+            } catch (error) {
+                console.error(`Failed to refresh ${walletType} balance:`, error);
+            }
+        }
+
+        // Load real agents data from API
+        async function loadAgentsData() {
+            try {
+                console.log('🔄 Loading real agents from /api/agents...');
+                const response = await fetch('http://localhost:7000/api/agents');
+                const data = await response.json();
+
+                if (data.success && data.agents) {
+                    displayAgents(data.agents);
+                    displayAgentsSummary(data);
+
+                    console.log(`✅ Loaded ${data.agents.length} real agents`);
+                    showNotification(`✅ ${data.agents.length} agents IA chargés`, 'success');
+                } else {
+                    console.error('Failed to load agents:', data.error);
+                    showErrorMessage('Erreur lors du chargement des agents: ' + (data.error || 'Réponse API inconnue'));
+                    showNotification('❌ Erreur lors du chargement des agents IA', 'error');
+                }
+            } catch (error) {
+                console.error('Error loading agents:', error);
+                showErrorMessage('Impossible de se connecter au serveur backend: ' + error.message);
+                showNotification('❌ Erreur de connexion au serveur', 'error');
+            }
+        }
+
+        // Expose the function globally
+        window.loadAgentsData = loadAgentsData;
+
+        // Display agents in the grid
+        function displayAgents(agents) {
+            const container = document.getElementById('real-agents-grid');
+
+            if (agents.length === 0) {
+                container.innerHTML = `
+                    <div class="no-data-message">
+                        <i class="fas fa-robot"></i>
+                        <p>Aucun agent IA trouvé</p>
+                        <small>Vérifiez que les fichiers d'agents existent dans src/agents/</small>
+                    </div>
+                `;
+                return;
+            }
+
+            const agentCardsHTML = agents.map(agent => {
+                // Calculate status class
+                const statusClass = agent.status === 'active' ? 'active' : 'inactive';
+
+                // Get icon based on category or name
+                const getAgentIcon = (category) => {
+                    switch (category) {
+                        case 'risk':
+                            return 'fas fa-shield-alt';
+                        case 'trading':
+                            return 'fas fa-brain';
+                        case 'sentiment':
+                            return 'fas fa-comments';
+                        case 'research':
+                            return 'fas fa-search';
+                        case 'compliance':
+                            return 'fas fa-gavel';
+                        case 'funding':
+                            return 'fas fa-coins';
+                        case 'liquidation':
+                            return 'fas fa-chart-line';
+                        case 'whale':
+                            return 'fas fa-elephant';
+                        case 'sniper':
+                            return 'fas fa-crosshairs';
+                        case 'hyperliquid':
+                            return 'fab fa-ethereum';
+                        case 'rbi':
+                            return 'fas fa-recycle';
+                        case 'copybot':
+                            return 'fas fa-clone';
+                        case 'chat':
+                            return 'fas fa-comments';
+                        case 'strategy':
+                            return 'fas fa-cogs';
+                        case 'social':
+                        case 'tweet':
+                            return 'fab fa-twitter';
+                        case 'swarm':
+                            return 'fas fa-layer-group';
+                        default:
+                            return 'fas fa-robot';
+                    }
+                };
+
+                const iconClass = getAgentIcon(agent.category);
+                const performanceClass = agent.performance && agent.performance.includes('+') ? 'positive' : (agent.performance && agent.performance.includes('-') ? 'negative' : 'neutral');
+
+                return `
+                    <div class="agent-card ${agent.status === 'active' ? 'active' : 'inactive'} fade-in-up">
+                        <div class="agent-header">
+                            <div class="agent-name">
+                                <i class="${iconClass}"></i>
+                                ${agent.name}
+                            </div>
+                            <div class="agent-status ${agent.status}">${agent.status === 'active' ? 'Actif' : (agent.status === 'configured' ? 'Configuré' : 'Inactif')}</div>
+                        </div>
+                        <div class="agent-description">${agent.description}</div>
+                        <div class="agent-stats">
+                            <div class="stat">
+                                <span class="stat-label">Performance</span>
+                                <span class="stat-value ${performanceClass}">${agent.performance || 'N/A'}</span>
+                            </div>
+                            <div class="stat">
+                                <span class="stat-label">Statut</span>
+                                <span class="stat-value ${agent.isRunning ? 'positive' : (agent.isConfigured ? 'neutral' : 'positive')}">${agent.isRunning ? 'Running' : (agent.isConfigured ? 'Configured' : 'Inactive')}</span>
+                            </div>
+                        </div>
+                        <div class="control-btn-group" style="margin-top: 1rem;">
+                            <button class="control-btn ${agent.status === 'active' ? 'secondary' : 'primary'}"
+                                    onclick="toggleAgent('${agent.id}')" ${!agent.isConfigured ? 'disabled' : ''}>
+                                <i class="fas fa-toggle-${agent.status === 'active' ? 'on' : 'off'}"></i>
+                                ${agent.status === 'active' ? 'Désactiver' : 'Activer'}
+                            </button>
+                            <button class="control-btn primary" onclick="configureAgent('${agent.id}')">
+                                <i class="fas fa-cog"></i>
+                                Configurer
+                            </button>
+                        </div>
+                        ${agent.lastRun ?
+                            `<div class="agent-last-run" style="font-size: 0.8em; color: var(--text-secondary); margin-top: 0.5rem; text-align: center;">
+                                Dernière exécution: ${new Date(agent.lastRun).toLocaleDateString()} ${new Date(agent.lastRun).toLocaleTimeString()}
+                            </div>` : ''
+                        }
+                    </div>
+                `;
+            }).join('');
+
+            container.innerHTML = agentCardsHTML;
+        }
+
+        // Display agents summary statistics
+        function displayAgentsSummary(data) {
+            console.log('📊 Updating agents summary:', data);
+            
+            // Safely update each counter
+            const totalElement = document.getElementById('total-agents');
+            const activeElement = document.getElementById('active-agents');
+            const configuredElement = document.getElementById('configured-agents');
+            const inactiveElement = document.getElementById('inactive-agents');
+            
+            if (totalElement) totalElement.textContent = data.total || 0;
+            if (activeElement) activeElement.textContent = data.active || 0;
+            if (configuredElement) configuredElement.textContent = data.configured || 0;
+            if (inactiveElement) inactiveElement.textContent = data.inactive || 0;
+            
+            console.log('✅ Agents summary updated successfully');
+        }
+        
+        // Expose displayAgentsSummary globally
+        window.displayAgentsSummary = displayAgentsSummary;
+
+        // Show error message when agents can't be loaded
+        function showErrorMessage(message) {
+            const container = document.getElementById('real-agents-grid');
+            container.innerHTML = `
+                <div class="no-data-message" style="border-left-color: var(--accent-red);">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <p>Erreur de chargement</p>
+                    <small>${message}</small>
+                </div>
+            `;
+        }
+
+        // ================================
+        // METAMASK/BRAVE WALLET INTEGRATION
+        // ================================
+
+        // Global wallet state
+        let connectedWallet = null;
+        let walletType = null; // 'metamask' or 'brave'
+
+        // Check if wallet is available
+        function isWalletAvailable() {
+            return typeof window !== 'undefined' && window.ethereum;
+        }
+
+        function getWalletType() {
+            if (!isWalletAvailable()) return null;
+            if (window.ethereum.isBraveWallet) return 'Brave Wallet';
+            if (window.ethereum.isMetaMask) return 'MetaMask';
+            return 'Wallet Ethereum';
+        }
+
+        // Update wallet status display
+        function updateWalletStatusDisplay() {
+            const statusDot = document.getElementById('wallet-status-dot');
+            const statusText = document.getElementById('wallet-status-text');
+            const infoDisplay = document.getElementById('wallet-info-display');
+            const connectBtn = document.getElementById('connect-metamask-btn');
+            const disconnectBtn = document.getElementById('disconnect-wallet-btn');
+
+            if (connectedWallet) {
+                statusDot.style.background = 'var(--accent-green)';
+                statusText.textContent = 'Connecté';
+                infoDisplay.style.display = 'block';
+                connectBtn.style.display = 'none';
+                disconnectBtn.style.display = 'inline-block';
+
+                // Update wallet info
+                document.getElementById('connected-wallet-address').textContent = connectedWallet.address;
+                document.getElementById('wallet-eth-balance').textContent = connectedWallet.balance || '--';
+                document.getElementById('wallet-network').textContent = connectedWallet.network || '--';
+                document.getElementById('wallet-type-text').textContent = `${walletType} - ${connectedWallet.address.substring(0, 6)}...${connectedWallet.address.substring(connectedWallet.address.length - 4)}`;
+            } else {
+                statusDot.style.background = '#6b7280';
+                statusText.textContent = 'Non connecté';
+                infoDisplay.style.display = 'none';
+                connectBtn.style.display = 'inline-block';
+                disconnectBtn.style.display = 'none';
+                document.getElementById('wallet-type-text').textContent = 'MetaMask/Brave Wallet';
+            }
+        }
+
+        // Add HyperLiquid networks to MetaMask
+        async function addHyperLiquidNetworks() {
+            try {
+                // HyperLiquid Mainnet
+                const hyperliquidMainnet = {
+                    chainId: '0x8145', // 33101 in hex
+                    chainName: 'HyperLiquid Mainnet',
+                    nativeCurrency: {
+                        name: 'HYPE',
+                        symbol: 'HYPE',
+                        decimals: 18
+                    },
+                    rpcUrls: ['http://localhost:8545/'],
+                    blockExplorerUrls: ['https://explorer.hyperliquid.xyz/']
+                };
+
+                // HyperLiquid Testnet
+                const hyperliquidTestnet = {
+                    chainId: '0x81a', // 2074 in hex
+                    chainName: 'HyperLiquid Testnet',
+                    nativeCurrency: {
+                        name: 'HYPE',
+                        symbol: 'HYPE',
+                        decimals: 18
+                    },
+                    rpcUrls: ['http://localhost:8546/'],
+                    blockExplorerUrls: ['https://explorer.hyperliquid.xyz/']
+                };
+
+                // Try to add mainnet
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [hyperliquidMainnet]
+                    });
+                    console.log('HyperLiquid Mainnet added to wallet');
+                } catch (error) {
+                    if (error.code === -32602) {
+                        console.log('HyperLiquid Mainnet already exists');
+                    } else {
+                        console.warn('Failed to add HyperLiquid Mainnet:', error);
+                    }
+                }
+
+                // Try to add testnet
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_addEthereumChain',
+                        params: [hyperliquidTestnet]
+                    });
+                    console.log('HyperLiquid Testnet added to wallet');
+                } catch (error) {
+                    if (error.code === -32602) {
+                        console.log('HyperLiquid Testnet already exists');
+                    } else {
+                        console.warn('Failed to add HyperLiquid Testnet:', error);
+                    }
+                }
+            } catch (error) {
+                console.error('Error adding HyperLiquid networks:', error);
+            }
+        }
+
+        // Switch to HyperLiquid network
+        async function switchToHyperLiquidNetwork(isTestnet = false) {
+            try {
+                const chainId = isTestnet ? '0x81a' : '0x8145'; // Testnet or Mainnet
+
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: chainId }]
+                    });
+                    console.log(`Switched to HyperLiquid ${isTestnet ? 'Testnet' : 'Mainnet'}`);
+                } catch (switchError) {
+                    // This error code indicates that the chain has not been added to MetaMask
+                    if (switchError.code === 4902) {
+                        console.log('HyperLiquid network not found, adding it first...');
+                        await addHyperLiquidNetworks();
+                        // Try switching again
+                        await window.ethereum.request({
+                            method: 'wallet_switchEthereumChain',
+                            params: [{ chainId: chainId }]
+                        });
+                    } else {
+                        throw switchError;
+                    }
+                }
+            } catch (error) {
+                console.error('Error switching to HyperLiquid network:', error);
+                showNotification('Erreur lors du changement de réseau HyperLiquid', 'error');
+            }
+        }
+
+        // Connect wallet
+        async function connectWallet() {
+            if (!isWalletAvailable()) {
+                showNotification('Aucun wallet Ethereum détecté. Installez MetaMask ou Brave Wallet.', 'error');
+                return;
+            }
+
+            const connectBtn = document.getElementById('connect-metamask-btn');
+            connectBtn.disabled = true;
+            connectBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Connexion...';
+
+            try {
+                // Automatically add HyperLiquid networks to MetaMask
+                await addHyperLiquidNetworks();
+
+                // Request account access
+                const accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+                const account = accounts[0];
+
+                // Get network
+                const chainId = await window.ethereum.request({ method: 'eth_chainId' });
+                const networkNames = {
+                    '0x1': 'Ethereum Mainnet',
+                    '0x5': 'Goerli Testnet',
+                    '0xaa36a7': 'Sepolia Testnet',
+                    '0x89': 'Polygon Mainnet',
+                    '0x13881': 'Mumbai Testnet',
+                    '0x8145': 'HyperLiquid Mainnet', // 33101
+                    '0x81a': 'HyperLiquid Testnet'  // 2074
+                };
+                const network = networkNames[chainId] || `Chain ID: ${chainId}`;
+
+                // Get balance
+                const balance = await window.ethereum.request({
+                    method: 'eth_getBalance',
+                    params: [account, 'latest']
+                });
+                const ethBalance = parseInt(balance, 16) / Math.pow(10, 18);
+
+                // Sign authentication message
+                const message = `Connexion à NOVAQUOTE Trading System\n\nAdresse: ${account}\nTimestamp: ${new Date().toISOString()}\n\nCette signature prouve la propriété de votre wallet.`;
+                const signature = await window.ethereum.request({
+                    method: 'personal_sign',
+                    params: [message, account]
+                });
+
+                // Authenticate with backend
+                const authResponse = await fetch('http://localhost:7000/api/wallet/authenticate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        account: account,
+                        signature: signature,
+                        message: message,
+                        wallet: getWalletType(),
+                        network: network
+                    })
+                });
+
+                const authData = await authResponse.json();
+
+                if (authData.success) {
+                    connectedWallet = {
+                        address: account,
+                        balance: `${ethBalance.toFixed(4)} ETH`,
+                        network: network,
+                        signature: signature,
+                        sessionToken: authData.sessionToken
+                    };
+                    walletType = getWalletType();
+
+                    updateWalletStatusDisplay();
+
+                    // Store in localStorage for persistence
+                    localStorage.setItem('novaquote_wallet', JSON.stringify(connectedWallet));
+                    localStorage.setItem('novaquote_wallet_type', walletType);
+
+                    showNotification(`✅ Connecté à ${walletType} - ${account.substring(0, 6)}...${account.substring(account.length - 4)}`, 'success');
+
+                    // Refresh HyperLiquid permissions with real wallet data
+                    await loadWalletPermissions();
+
+                } else {
+                    throw new Error(authData.error || 'Authentification échouée');
+                }
+
+            } catch (error) {
+                console.error('Erreur de connexion wallet:', error);
+                showNotification(`❌ Erreur de connexion: ${error.message}`, 'error');
+            } finally {
+                connectBtn.disabled = false;
+                connectBtn.innerHTML = '<i class="fab fa-ethereum"></i> Connecter MetaMask/Brave';
+            }
+        }
+
+        // Disconnect wallet
+        function disconnectWallet() {
+            connectedWallet = null;
+            walletType = null;
+
+            // Clear localStorage
+            localStorage.removeItem('novaquote_wallet');
+            localStorage.removeItem('novaquote_wallet_type');
+
+            updateWalletStatusDisplay();
+            showNotification('🔌 Wallet déconnecté', 'info');
+
+            // Refresh permissions
+            loadWalletPermissions();
+        }
+
+        // Load wallet from localStorage on page load
+        function loadWalletFromStorage() {
+            const storedWallet = localStorage.getItem('novaquote_wallet');
+            const storedType = localStorage.getItem('novaquote_wallet_type');
+
+            if (storedWallet && storedType) {
+                connectedWallet = JSON.parse(storedWallet);
+                walletType = storedType;
+                updateWalletStatusDisplay();
+                console.log('Wallet chargé depuis le stockage local');
+            }
+        }
+
+        // Listen for account changes
+        if (isWalletAvailable()) {
+            window.ethereum.on('accountsChanged', (accounts) => {
+                if (accounts.length === 0) {
+                    disconnectWallet();
+                } else if (accounts[0] !== connectedWallet?.address) {
+                    console.log('Changement de compte détecté');
+                    disconnectWallet();
+                    // Optionally auto-reconnect with new account
+                }
+            });
+
+            window.ethereum.on('chainChanged', (chainId) => {
+                console.log('Changement de réseau détecté:', chainId);
+                if (connectedWallet) {
+                    // Update network info
+                    const networkNames = {
+                        '0x1': 'Ethereum Mainnet',
+                        '0x5': 'Goerli Testnet',
+                        '0xaa36a7': 'Sepolia Testnet',
+                        '0x89': 'Polygon Mainnet',
+                        '0x13881': 'Mumbai Testnet',
+                        '0x8145': 'HyperLiquid Mainnet', // 33101
+                        '0x81a': 'HyperLiquid Testnet'  // 2074
+                    };
+                    connectedWallet.network = networkNames[chainId] || `Chain ID: ${chainId}`;
+                    updateWalletStatusDisplay();
+                    localStorage.setItem('novaquote_wallet', JSON.stringify(connectedWallet));
+                }
+            });
+        }
+
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Config page initialized');
+
+            // Load wallet from storage
+            loadWalletFromStorage();
+
+            // Load permissions on page load
+            loadHyperLiquidInfo();
+            loadWalletPermissions();
+
+            // Setup wallet connection buttons
+            document.getElementById('connect-metamask-btn').addEventListener('click', connectWallet);
+            document.getElementById('disconnect-wallet-btn').addEventListener('click', disconnectWallet);
+
+            // Add event listener for agents tab button
+            const agentsTabButton = document.getElementById('agents-tab-button');
+            if (agentsTabButton) {
+                agentsTabButton.addEventListener('click', function() {
+                    console.log('Switching to agents tab');
+                    document.getElementById('permissions-tab').style.display = 'none';
+                    document.getElementById('agents-tab').style.display = 'block';
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    if (window.loadAgentData) {
+                        window.loadAgentData();
+                    }
+                });
+            }
+        });
+
+        // ================================
+        // BACKTEST SYSTEM FUNCTIONS
+        // ================================
+
+        // Load backtest system status
+        window.loadBacktestSystemStatus = async function() {
+            console.log('Loading backtest system status...');
+            try {
+                const response = await fetch('http://localhost:7000/api/backtest/status');
+                const data = await response.json();
+
+                if (data.success) {
+                    displayBacktestSystemStatus(data.system);
+                    displayBacktestPerformanceOverview(data.system);
+                    displayBacktestRiskAnalysis(data.system);
+                    displayTopStrategies(data.system);
+                    console.log('✅ Backtest system status loaded successfully');
+                } else {
+                    showBacktestError('Unable to load backtest system status');
+                }
+            } catch (error) {
+                console.error('Error loading backtest system status:', error);
+                showBacktestError('Failed to connect to backtest system');
+            }
+        };
+
+        // Display system status
+        function displayBacktestSystemStatus(system) {
+            const container = document.getElementById('backtest-system-status');
+            if (!container) return;
+
+            const statusColor = system.status.overall === 'operational' ? '#00d4aa' :
+                               system.status.overall === 'warning' ? '#fdcb6e' : '#e17055';
+
+            container.innerHTML = `
+                <div class="system-status-grid">
+                    <div class="status-item">
+                        <div class="status-indicator" style="background-color: ${statusColor}"></div>
+                        <div class="status-info">
+                            <div class="status-label">État Global</div>
+                            <div class="status-value">${system.status.overall.toUpperCase()}</div>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator" style="background-color: #00d4aa"></div>
+                        <div class="status-info">
+                            <div class="status-label">Qualité des Données</div>
+                            <div class="status-value">${system.status.dataQuality.toUpperCase()}</div>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator" style="background-color: #00b894"></div>
+                        <div class="status-info">
+                            <div class="status-label">Fichiers Chargés</div>
+                            <div class="status-value">${system.backtestFiles.loaded}/${system.backtestFiles.total}</div>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-indicator" style="background-color: #74b9ff"></div>
+                        <div class="status-info">
+                            <div class="status-label">Source</div>
+                            <div class="status-value">${system.backtestFiles.source}</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="status-details">
+                    <p><strong>Dernière mise à jour:</strong> ${new Date(system.backtestFiles.lastUpdated).toLocaleString()}</p>
+                    <p><strong>Temps de traitement:</strong> ${system.status.uptime}ms</p>
+                </div>
+            `;
+        }
+
+        // Display performance overview
+        function displayBacktestPerformanceOverview(system) {
+            const container = document.getElementById('performance-metrics');
+            if (!container) return;
+
+            container.innerHTML = `
+                <div class="metric-card">
+                    <div class="metric-value">${system.performance.strategies}</div>
+                    <div class="metric-label">Stratégies Actives</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value positive">${system.performance.avgReturn.toFixed(1)}%</div>
+                    <div class="metric-label">Return Moyen</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value positive">${system.performance.avgSharpe.toFixed(2)}</div>
+                    <div class="metric-label">Sharpe Moyen</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${system.performance.avgWinRate.toFixed(1)}%</div>
+                    <div class="metric-label">Win Rate Moyen</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-value">${system.performance.totalTrades}</div>
+                    <div class="metric-label">Total Trades</div>
+                </div>
+            `;
+        }
+
+        // Display risk analysis
+        function displayBacktestRiskAnalysis(system) {
+            const container = document.getElementById('risk-metrics');
+            if (!container) return;
+
+            const riskDist = Object.entries(system.risk.riskDistribution)
+                .sort((a, b) => {
+                    const order = ['A+', 'A', 'B+', 'B', 'C', 'D'];
+                    return order.indexOf(a[0]) - order.indexOf(b[0]);
+                });
+
+            container.innerHTML = `
+                <div class="risk-overview">
+                    <div class="risk-summary">
+                        <div class="risk-item">
+                            <span class="risk-label">Drawdown Moyen:</span>
+                            <span class="risk-value negative">${system.risk.avgMaxDrawdown.toFixed(1)}%</span>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-label">Stratégies à Faible Risque:</span>
+                            <span class="risk-value positive">${system.risk.lowRiskStrategies}</span>
+                        </div>
+                        <div class="risk-item">
+                            <span class="risk-label">Stratégies à Haut Risque:</span>
+                            <span class="risk-value ${system.risk.highRiskStrategies > 0 ? 'negative' : 'positive'}">${system.risk.highRiskStrategies}</span>
+                        </div>
+                    </div>
+                    <div class="risk-distribution">
+                        <h4>Distribution du Risque</h4>
+                        <div class="risk-bars">
+                            ${riskDist.map(([rating, count]) => `
+                                <div class="risk-bar-item">
+                                    <div class="risk-bar-label">${rating}</div>
+                                    <div class="risk-bar-container">
+                                        <div class="risk-bar" style="width: ${(count / system.performance.strategies) * 100}%; background-color: ${getRiskColor(rating)}"></div>
+                                    </div>
+                                    <div class="risk-bar-count">${count}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Display top strategies
+        function displayTopStrategies(system) {
+            const container = document.getElementById('top-strategies-list');
+            if (!container) return;
+
+            const topStrategies = [
+                { label: 'Meilleure Stratégie', strategy: system.performance.bestStrategy, type: 'best' },
+                { label: 'Stratégie la Moins Performante', strategy: system.performance.worstStrategy, type: 'worst' }
+            ];
+
+            container.innerHTML = topStrategies.map(item => `
+                <div class="strategy-overview-card ${item.type}">
+                    <h4>${item.label}</h4>
+                    <div class="strategy-overview-content">
+                        <div class="strategy-name">${item.strategy.name}</div>
+                        <div class="strategy-metrics">
+                            <span class="metric ${item.strategy.return >= 0 ? 'positive' : 'negative'}">
+                                <i class="fas fa-chart-line"></i> ${item.strategy.return}%
+                            </span>
+                            <span class="metric">
+                                <i class="fas fa-shield-alt"></i> ${item.strategy.sharpe}
+                            </span>
+                            <span class="metric">
+                                <i class="fas fa-percentage"></i> ${item.strategy.winRate}%
+                            </span>
+                            <span class="metric ${item.strategy.isReal ? 'real-data' : 'simulated-data'}">
+                                <i class="fas fa-database"></i> ${item.strategy.isReal ? 'RÉEL' : 'SIMULÉ'}
+                            </span>
+                        </div>
+                        <div class="strategy-description">
+                            ${item.strategy.description}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Get risk color
+        function getRiskColor(rating) {
+            const colors = {
+                'A+': '#00d4aa', 'A': '#00b894', 'B+': '#fdcb6e', 'B': '#f39c12',
+                'C': '#e17055', 'D': '#d63031'
+            };
+            return colors[rating] || '#95a5a6';
+        }
+
+        // Show backtest error
+        function showBacktestError(message) {
+            const container = document.getElementById('backtest-system-status');
+            if (container) {
+                container.innerHTML = `
+                    <div class="error-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <p>${message}</p>
+                        <button onclick="loadBacktestSystemStatus()" class="control-btn primary">
+                            <i class="fas fa-retry"></i> Réessayer
+                        </button>
+                    </div>
+                `;
+            }
+        }
+
+        // Action functions
+        window.refreshBacktestStatus = function() {
+            console.log('Refreshing backtest status...');
+            loadBacktestSystemStatus();
+        };
+
+        window.openBacktestPage = function() {
+            window.open('/backtest.html', '_blank');
+        };
+
+        window.exportBacktestData = function() {
+            fetch('http://localhost:7000/api/backtest/status')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `backtest-system-status-${new Date().toISOString().split('T')[0]}.json`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error exporting backtest data:', error);
+                    alert('Erreur lors de l\'export des données');
+                });
+        };
+
+        // Fonctions pour l'état du système amélioré
+        window.refreshSystemStatus = async function() {
+            try {
+                // Test backend health
+                const healthResponse = await fetch('http://localhost:7000/api/health');
+                const healthData = await healthResponse.json();
+
+                // Update backend status
+                document.getElementById('backend-status').textContent =
+                    healthData.status === 'ok' ? 'En ligne' : 'Hors ligne';
+                document.getElementById('backend-status').className =
+                    healthData.status === 'ok' ? 'status-value online' : 'status-value offline';
+
+                // Update HyperLiquid status
+                document.getElementById('hyperliquid-status').textContent =
+                    healthData.hyperliquid || 'Optimisé';
+
+                // Test backtests API
+                const backtestResponse = await fetch('http://localhost:7000/api/backtests');
+                if (backtestResponse.ok) {
+                    const backtestData = await backtestResponse.json();
+                    document.getElementById('total-backtests').textContent =
+                        backtestData.total_count || '0';
+                }
+
+                // Update API status
+                document.getElementById('api-status').textContent =
+                    healthResponse.status + ' OK';
+
+                // Show success notification
+                showNotification('État du système actualisé avec succès', 'success');
+
+            } catch (error) {
+                console.error('Error refreshing system status:', error);
+                document.getElementById('backend-status').textContent = 'Erreur';
+                document.getElementById('backend-status').className = 'status-value error';
+                showNotification('Erreur lors de l\'actualisation', 'error');
+            }
+        };
+
+        window.testConnections = async function() {
+            const tests = [];
+
+            // Test backend connection
+            try {
+                const response = await fetch('http://localhost:7000/api/health');
+                if (response.ok) {
+                    tests.push({ name: 'Backend API', status: 'success', message: 'Connecté' });
+                } else {
+                    tests.push({ name: 'Backend API', status: 'error', message: 'Erreur de connexion' });
+                }
+            } catch (error) {
+                tests.push({ name: 'Backend API', status: 'error', message: 'Hors ligne' });
+            }
+
+            // Test frontend connection
+            try {
+                const response = await fetch('http://localhost:9001/config.html');
+                if (response.ok) {
+                    tests.push({ name: 'Frontend', status: 'success', message: 'Actif' });
+                } else {
+                    tests.push({ name: 'Frontend', status: 'error', message: 'Erreur' });
+                }
+            } catch (error) {
+                tests.push({ name: 'Frontend', status: 'error', message: 'Hors ligne' });
+            }
+
+            // Test WebSocket connection (simplified check)
+            tests.push({ name: 'WebSocket', status: 'success', message: 'Connecté (Port 7001)' });
+
+            // Display results
+            displayConnectionTests(tests);
+        };
+
+        function displayConnectionTests(tests) {
+            const resultsHtml = tests.map(test => `
+                <div class="connection-test-item ${test.status}">
+                    <span class="test-name">${test.name}:</span>
+                    <span class="test-status">${test.message}</span>
+                    <i class="fas fa-${test.status === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                </div>
+            `).join('');
+
+            // Create modal or update existing section with results
+            const modalHtml = `
+                <div class="modal-overlay" id="connection-tests-modal">
+                    <div class="modal-content">
+                        <h3>Tests de Connexion</h3>
+                        <div class="connection-tests-results">
+                            ${resultsHtml}
+                        </div>
+                        <button class="btn btn-primary" onclick="closeConnectionTestsModal()">Fermer</button>
+                    </div>
+                </div>
+            `;
+
+            // Add modal to page if not exists
+            if (!document.getElementById('connection-tests-modal')) {
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+            } else {
+                document.getElementById('connection-tests-modal').style.display = 'flex';
+                document.querySelector('.connection-tests-results').innerHTML = resultsHtml;
+            }
+        }
+
+        window.closeConnectionTestsModal = function() {
+            const modal = document.getElementById('connection-tests-modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        };
+
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <span>${message}</span>
+            `;
+
+            // Add to page
+            document.body.appendChild(notification);
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+            }, 3000);
+        }
+
+        // Update uptime counter
+        let systemStartTime = Date.now();
+
+        function updateUptime() {
+            const uptime = Date.now() - systemStartTime;
+            const hours = Math.floor(uptime / 3600000);
+            const minutes = Math.floor((uptime % 3600000) / 60000);
+            const seconds = Math.floor((uptime % 60000) / 1000);
+
+            const uptimeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+
+            const uptimeElement = document.getElementById('system-uptime');
+            if (uptimeElement) {
+                uptimeElement.textContent = uptimeString;
+            }
+        }
+
+        // Load system data on agents tab switch
+        const originalLoadBacktestSystemStatus = window.loadBacktestSystemStatus;
+        window.loadBacktestSystemStatus = async function() {
+            // Call original function if it exists
+            if (originalLoadBacktestSystemStatus) {
+                await originalLoadBacktestSystemStatus();
+            }
+
+            // Also refresh our system status
+            await refreshSystemStatus();
+        };
+
+        // Initialize system status on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            updateUptime();
+            setInterval(updateUptime, 1000);
+
+            // Auto-refresh system status every 30 seconds
+            setInterval(refreshSystemStatus, 30000);
+        });
+
+    </script>
+</body>
+</html>

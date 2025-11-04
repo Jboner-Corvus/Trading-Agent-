@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Agents Loading</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-result { margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .success { background: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+        .error { background: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+        .agent-card { border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; }
+        .status { font-weight: bold; }
+        .running { color: #28a745; }
+        .stopped { color: #dc3545; }
+    </style>
+</head>
+<body>
+    <h1>🤖 Test de Chargement des Agents</h1>
+
+    <div id="test-results">
+        <div class="test-result pending">Test de connexion à l'API agents...</div>
+    </div>
+
+    <div id="agents-container">
+        <p>Chargement des agents...</p>
+    </div>
+
+    <script>
+        async function testAgentsLoading() {
+            const resultsDiv = document.getElementById('test-results');
+            const agentsContainer = document.getElementById('agents-container');
+
+            try {
+                // Test 1: Connexion à l'API
+                const response = await fetch('http://localhost:7000/api/agents');
+
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+
+                const data = await response.json();
+
+                resultsDiv.innerHTML = `
+                    <div class="test-result success">
+                        ✅ Connexion API réussie (Status: ${response.status})
+                    </div>
+                `;
+
+                // Test 2: Vérification des données
+                if (data.success && data.agents) {
+                    resultsDiv.innerHTML += `
+                        <div class="test-result success">
+                            ✅ Données reçues: ${data.agents.length} agent(s) trouvé(s)
+                        </div>
+                    `;
+
+                    // Afficher les agents
+                    const agentsHtml = data.agents.map(agent => `
+                        <div class="agent-card">
+                            <h3>${agent.name}</h3>
+                            <p><strong>ID:</strong> ${agent.id}</p>
+                            <p><strong>Status:</strong> <span class="status ${agent.status === 'running' ? 'running' : 'stopped'}">${agent.status}</span></p>
+                            <p><strong>PID:</strong> ${agent.pid || 'N/A'}</p>
+                            <p><strong>Symbols:</strong> ${agent.symbols ? agent.symbols.join(', ') : 'N/A'}</p>
+                        </div>
+                    `).join('');
+
+                    agentsContainer.innerHTML = agentsHtml;
+
+                    resultsDiv.innerHTML += `
+                        <div class="test-result success">
+                            ✅ Affichage des agents réussi
+                        </div>
+                    `;
+
+                } else {
+                    throw new Error('Aucun agent trouvé dans la réponse');
+                }
+
+            } catch (error) {
+                resultsDiv.innerHTML = `
+                    <div class="test-result error">
+                        ❌ Erreur: ${error.message}
+                    </div>
+                `;
+
+                agentsContainer.innerHTML = `
+                    <div class="test-result error">
+                        Impossible de charger les agents: ${error.message}
+                    </div>
+                `;
+            }
+        }
+
+        // Lancer le test au chargement de la page
+        window.onload = testAgentsLoading;
+    </script>
+</body>
+</html>

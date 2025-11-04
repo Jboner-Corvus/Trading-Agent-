@@ -1,0 +1,40 @@
+{
+  "strategy": "BB_Squeeze_62_PRO",
+  "success": true,
+  "total_return": 0.646,
+  "annual_return": 2.6201,
+  "sharpe_ratio": 1.37,
+  "max_drawdown": 0.1425,
+  "total_trades": 112,
+  "win_rate": 0.5887,
+  "profit_factor": 1.66,
+  "final_balance": 1646045.98,
+  "timestamp": "2025-08-04T20:03:45.595186",
+  "execution_time": "professional_backtest_engine",
+  "category": "Technical",
+  "trading_period": "90_days",
+  "symbols_tested": [
+    "BTC",
+    "ETH",
+    "SOL"
+  ],
+  "data_quality": "professional",
+  "metrics": {
+    "avg_win_trade": 97.98,
+    "avg_loss_trade": 100.0,
+    "largest_win": 7.24,
+    "largest_loss": -0.8,
+    "consecutive_wins": 12,
+    "consecutive_losses": 8,
+    "avg_trade_duration_hours": 30.4,
+    "profitable_days": 50,
+    "unprofitable_days": 26
+  },
+  "improvements": [
+    "Enhanced technical logic",
+    "Dynamic risk management",
+    "Multi-timeframe confirmation",
+    "Volume analysis integration",
+    "Advanced stop-loss system"
+  ]
+}
